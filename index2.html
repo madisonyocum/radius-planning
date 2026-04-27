@@ -589,11 +589,16 @@ const colorPalette = [
   { stroke: "#d83a52", fill: "#d83a52" },
 ];
 
+const _savedOrder = JSON.parse(localStorage.getItem("rb_selectionOrder") || "[]");
 const state = {
   expanded: new Set(["restaurants", "fast_food", "mcdonalds"]),
-  selected: new Set(),
-  selectionOrder: [],
+  selected: new Set(_savedOrder),
+  selectionOrder: _savedOrder,
 };
+
+function saveState() {
+  localStorage.setItem("rb_selectionOrder", JSON.stringify(state.selectionOrder));
+}
 
 /* ------------ Render segment tree ------------ */
 function renderSegments() {
@@ -691,6 +696,7 @@ function toggleSelection(id) {
     state.selected.add(id);
     state.selectionOrder.push(id);
   }
+  saveState();
   renderSegments();
   renderMap();
   renderMetricsBar();
@@ -846,6 +852,7 @@ function showTooltip(ev, id) {
     hideTooltip();
     state.selected.delete(id);
     state.selectionOrder = state.selectionOrder.filter(x => x !== id);
+    saveState();
     renderSegments();
     renderMap();
     renderMetricsBar();
@@ -1039,6 +1046,7 @@ mapPanel.addEventListener("drop", (e) => {
   if (id && segmentPOIs[id] && !state.selected.has(id)) {
     state.selected.add(id);
     state.selectionOrder.push(id);
+    saveState();
     renderSegments();
     renderMap();
     renderMetricsBar();
