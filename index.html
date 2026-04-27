@@ -800,8 +800,8 @@ function clusterPOIs(id) {
     const pts = indices.map(i => pois[i]);
     const lat = pts.reduce((s, p) => s + p[0], 0) / pts.length;
     const lng = pts.reduce((s, p) => s + p[1], 0) / pts.length;
-    const maxR = Math.max(...pts.map(p => p[2]));
-    const radius = maxR * (1 + 0.35 * Math.log(pts.length + 1));
+    const baseR = defaultRadiusForSegment(id);
+    const radius = baseR * (1 + 0.35 * Math.log(pts.length + 1));
     const intensity = pts.reduce((s, p) => s + p[3], 0) / pts.length;
     return { lat, lng, radius, intensity, count: pts.length };
   });
