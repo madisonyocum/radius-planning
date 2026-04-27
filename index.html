@@ -618,8 +618,8 @@ const colorPalette = [
 /* ------------ State ------------ */
 const state = {
   expanded: new Set(["restaurants", "fast_food", "mcdonalds"]),
-  selected: new Set(["chick_fil_a"]), // start with one selected so map matches screenshot 1
-  selectionOrder: ["chick_fil_a"],
+  selected: new Set(),
+  selectionOrder: [],
 };
 
 /* ------------ Render segment tree ------------ */
@@ -801,7 +801,7 @@ function clusterPOIs(id) {
     const lat = pts.reduce((s, p) => s + p[0], 0) / pts.length;
     const lng = pts.reduce((s, p) => s + p[1], 0) / pts.length;
     const baseR = defaultRadiusForSegment(id);
-    const radius = baseR * (1 + 0.35 * Math.log(pts.length + 1));
+    const radius = pts.length > 1 ? baseR * (1 + 0.35 * Math.log(pts.length + 1)) : baseR;
     const intensity = pts.reduce((s, p) => s + p[3], 0) / pts.length;
     return { lat, lng, radius, intensity, count: pts.length };
   });
