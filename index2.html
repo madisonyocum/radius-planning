@@ -724,9 +724,10 @@ function effectiveRadius(id, baseRadius) {
 }
 
 function defaultRadiusForSegment(id) {
-  const pois = segmentPOIs[id] || [];
-  if (!pois.length) return 200;
-  return Math.round(pois.reduce((s, p) => s + p[2], 0) / pois.length);
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffffffff;
+  const t = (Math.abs(hash) % 1000) / 1000;
+  return Math.round(120 + t * 260); // 120m–380m, unique per segment
 }
 
 function clusterPOIs(id) {
