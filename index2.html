@@ -181,6 +181,9 @@
   .map-drop-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border: 2px dashed #2b6cdf; border-radius: 10px; padding: 16px 28px; font-size: 14px; font-weight: 500; color: #2b6cdf; pointer-events: none; z-index: 600; display: none; white-space: nowrap; }
   .map-panel.drag-over .map-drop-hint { display: block; }
 
+  /* Ad placement dots */
+  .ad-dot { width: 10px; height: 10px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.28); }
+
   /* Leaflet overrides */
   .leaflet-container { font-family: inherit; background: #fff; border-radius: 10px; }
   .leaflet-control-attribution { font-size: 10px; }
@@ -716,7 +719,43 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
 }).addTo(map);
 
 const circleLayer = L.layerGroup().addTo(map);
+const adLayer = L.layerGroup().addTo(map);
 const tooltipEl = document.getElementById("mapTooltip");
+
+/* ------------ Ad placements ------------ */
+const adPlacements = [
+  [37.7990, -122.4115], [37.7965, -122.4070], [37.7935, -122.4040],
+  [37.7900, -122.4185], [37.7860, -122.4090], [37.7920, -122.4130],
+  [37.7780, -122.4030], [37.7700, -122.4080], [37.7855, -122.4215],
+  [37.7870, -122.4160], [37.7830, -122.4080], [37.7750, -122.4120],
+  [37.7910, -122.4095], [37.7780, -122.4200], [37.7720, -122.4050],
+  [37.7950, -122.4090], [37.7870, -122.4180], [37.7810, -122.4110],
+  [37.7730, -122.4090], [37.7800, -122.4275], [37.7820, -122.4175],
+  [37.7740, -122.4070], [37.7895, -122.4035], [37.7790, -122.3995],
+  [37.7755, -122.3955], [37.7715, -122.4105], [37.7844, -122.4080],
+  [37.7890, -122.4015], [37.7796, -122.4148], [37.7760, -122.4060],
+  [37.7880, -122.4074], [37.7816, -122.4051], [37.7795, -122.4185],
+  [37.7940, -122.4100], [37.7880, -122.4160], [37.7800, -122.4070],
+  [37.7910, -122.4070], [37.7860, -122.4130], [37.7780, -122.4210],
+  [37.7850, -122.4090], [37.7760, -122.4150], [37.7930, -122.4110],
+  [37.7870, -122.4060], [37.7800, -122.4180], [37.7730, -122.4080],
+  [37.7870, -122.4090], [37.7790, -122.4220], [37.7910, -122.4145],
+  [37.7760, -122.4090], [37.7720, -122.4180], [37.7850, -122.4200],
+];
+
+const adIcon = L.divIcon({
+  className: "",
+  html: '<div class="ad-dot"></div>',
+  iconSize: [10, 10],
+  iconAnchor: [5, 5],
+});
+
+function renderAdPlacements() {
+  adLayer.clearLayers();
+  adPlacements.forEach(([lat, lng]) => {
+    L.marker([lat, lng], { icon: adIcon, interactive: false }).addTo(adLayer);
+  });
+}
 
 function colorForSegment(id) {
   const idx = state.selectionOrder.indexOf(id);
@@ -1056,6 +1095,7 @@ mapPanel.addEventListener("drop", (e) => {
 /* ------------ Init ------------ */
 renderSegments();
 renderMap();
+renderAdPlacements();
 renderMetricsBar();
 
 document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
