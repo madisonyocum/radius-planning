@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Audience Builder — VIP Rewards Customers</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; color: #1a2233; background: #f5f7fb; font-size: 14px; }
+
+  .app { display: flex; flex-direction: column; height: 100vh; min-height: 100vh; }
+
+  /* Top bar */
+  .topbar { display: flex; align-items: center; gap: 16px; padding: 7px 20px; border-bottom: 1px solid #e6ebf2; background: #fff; flex-shrink: 0; }
+  .topbar .menu-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .topbar .menu-btn:hover { background: #f0f3f8; }
+  .topbar .logo { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+  .topbar .logo:hover { background: #f0f3f8; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; color: #4a5878; font-size: 14px; flex: 1; }
+  .breadcrumb .sep { color: #c0c8d6; }
+  .breadcrumb .crumb { padding: 4px 6px; border-radius: 4px; cursor: pointer; }
+  .breadcrumb .crumb:hover { background: #f0f3f8; }
+  .breadcrumb .crumb.active { color: #1a2233; font-weight: 500; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .topbar-right .icon-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5878; }
+  .topbar-right .icon-btn:hover { background: #f0f3f8; }
+  .topbar-right .help-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #2b6cdf; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; cursor: pointer; }
+
+  /* Header */
+  .header { display: flex; align-items: center; gap: 14px; padding: 14px 24px 10px; background: #fff; }
+  .header .back-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #e6ebf2; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5878; }
+  .header .back-btn:hover { background: #f0f3f8; }
+  .header .audience-icon { width: 36px; height: 36px; border-radius: 50%; background: #eef2f9; display: flex; align-items: center; justify-content: center; color: #4a5878; }
+  .header-info { flex: 1; }
+  .header-info .title-row { display: flex; align-items: center; gap: 10px; }
+  .header-info h1 { margin: 0; font-size: 20px; font-weight: 700; color: #1a2233; }
+  .header-info .edit-btn { width: 24px; height: 24px; border-radius: 4px; border: none; background: transparent; cursor: pointer; color: #6b7a99; display: flex; align-items: center; justify-content: center; }
+  .header-info .edit-btn:hover { background: #f0f3f8; }
+  .header-info .meta { display: flex; align-items: center; gap: 10px; margin-top: 4px; color: #6b7a99; font-size: 13px; }
+  .header-info .meta .sep { color: #d2d8e3; }
+  .header-info .meta .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .btn { padding: 8px 14px; border-radius: 8px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; transition: all 0.12s; border: 1px solid transparent; }
+  .btn-text { background: transparent; color: #1a2233; border-color: transparent; }
+  .btn-text:hover { background: #f0f3f8; }
+  .btn-icon { background: #fff; border: 1px solid #2b6cdf; color: #2b6cdf; padding: 7px 10px; }
+  .btn-icon:hover { background: #eaf1fc; }
+  .btn-outline { background: #fff; border: 1px solid #2b6cdf; color: #2b6cdf; }
+  .btn-outline:hover { background: #eaf1fc; }
+  .btn-primary { background: #2b6cdf; color: #fff; border-color: #2b6cdf; }
+  .btn-primary:hover { background: #2057bd; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 20px; padding: 0 24px; background: #fff; border-bottom: 1px solid #e6ebf2; }
+  .tab { padding: 10px 4px; cursor: pointer; color: #6b7a99; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab:hover { color: #1a2233; }
+  .tab.active { color: #2b6cdf; border-bottom-color: #2b6cdf; }
+
+  /* Main layout — 2 columns, no stats panel */
+  .main { display: grid; grid-template-columns: 320px 1fr; gap: 10px; padding: 10px; flex: 1; min-height: 0; }
+
+  /* Left panel */
+  .panel { background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+  .left-tabs { display: flex; border-bottom: 1px solid #e6ebf2; }
+  .left-tab { flex: 1; padding: 14px; text-align: center; cursor: pointer; color: #6b7a99; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.12s; }
+  .left-tab:hover { color: #1a2233; }
+  .left-tab.active { color: #2b6cdf; border-bottom-color: #2b6cdf; }
+  .search-wrap { padding: 12px 14px; border-bottom: 1px solid #e6ebf2; }
+  .search-input { width: 100%; padding: 9px 14px 9px 36px; border: 1px solid #d2d8e3; border-radius: 20px; font-size: 13px; color: #1a2233; background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239aa3b5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") 13px center no-repeat; }
+  .search-input::placeholder { color: #9aa3b5; }
+  .search-input:focus { outline: none; border-color: #2b6cdf; }
+  .segments-list { flex: 1; overflow-y: auto; padding: 4px 0; }
+
+  .segment-node { user-select: none; }
+  .segment-node[data-depth="0"] { border-bottom: 1px solid #e6ebf2; }
+  .segment-node[data-depth="0"]:last-child { border-bottom: none; }
+
+  .segment-row { display: flex; align-items: center; gap: 8px; padding: 13px 18px; cursor: pointer; font-size: 15px; color: #1a2233; transition: background 0.1s; }
+  .segment-row:hover { background: #f5f7fb; }
+  .segment-row.selected { background: transparent; color: #2b6cdf; }
+  .segment-row.selected::before { content: ''; position: absolute; left: 6px; right: 6px; top: 2px; bottom: 2px; background: #eaf1fc; border-radius: 7px; z-index: -1; }
+  .segment-row { position: relative; }
+  .segment-row[data-depth="0"] { font-weight: 700; font-size: 15.5px; padding: 15px 18px; }
+  .segment-row[data-depth="0"].selected { color: #2b6cdf; }
+
+  .segment-row .chevron { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; color: #6b7a99; transition: transform 0.15s; flex-shrink: 0; }
+  .segment-row .chevron.expanded { transform: rotate(90deg); }
+  .segment-row .chevron.placeholder { visibility: hidden; }
+  .segment-row .chevron-sub { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; color: #9aa3b5; transition: transform 0.15s; flex-shrink: 0; }
+  .segment-row .chevron-sub.collapsed { transform: rotate(0deg); }
+  .segment-row .chevron-sub:not(.collapsed):not(.placeholder) { transform: rotate(90deg); }
+  .segment-row .chevron-sub.placeholder { visibility: hidden; }
+  .segment-row .pin { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: #9aa3b5; flex-shrink: 0; }
+  .segment-row.selected .pin { color: #2b6cdf; }
+  .segment-row.selected .chevron-sub { color: #2b6cdf; }
+  .segment-children { padding-left: 18px; }
+
+  /* Map */
+  .map-panel { padding: 0; position: relative; }
+  #map { width: 100%; height: 100%; border-radius: 10px; }
+
+  /* Legend */
+  .map-legend { position: absolute; bottom: 14px; left: 14px; background: #fff; padding: 8px 12px 7px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); z-index: 500; }
+  .legend-bar { width: 150px; height: 7px; border-radius: 4px; background: linear-gradient(to right, #dce8ff, #6b9ef0, #1a3fa8); margin-bottom: 5px; }
+  .legend-labels { display: flex; justify-content: space-between; font-size: 11px; color: #6b7a99; width: 150px; }
+
+  /* On-map metrics bar (bottom right) */
+  .map-metrics-bar { position: absolute; bottom: 14px; right: 14px; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.13); z-index: 500; padding: 18px 22px; display: flex; flex-direction: column; gap: 16px; min-width: 300px; }
+  .map-metrics-bar.hidden { display: none; }
+  .map-metrics-segments { display: flex; flex-direction: column; gap: 11px; }
+  .map-metrics-segment-row { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #1a2233; font-weight: 500; }
+  .map-metrics-segment-vals { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .map-metrics-segment-val { font-size: 12px; color: #6b7a99; white-space: nowrap; }
+  .map-metrics-segment-val strong { color: #1a2233; font-weight: 600; }
+  .map-metrics-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .map-metrics-divider { height: 1px; background: #e6ebf2; }
+  .map-metrics-totals { display: flex; align-items: center; gap: 0; }
+  .map-metric-item { display: flex; align-items: baseline; gap: 7px; flex: 1; }
+  .map-metric-label { font-size: 12px; color: #6b7a99; white-space: nowrap; }
+  .map-metric-value { font-size: 17px; font-weight: 600; color: #1a2233; }
+  .map-metric-sep { width: 1px; height: 24px; background: #e6ebf2; margin: 0 14px; flex-shrink: 0; }
+
+  /* Zoom controls */
+  .map-zoom { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
+  .map-zoom-btn { width: 34px; height: 34px; background: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); cursor: pointer; font-size: 18px; color: #4a5878; display: flex; align-items: center; justify-content: center; font-weight: 300; transition: background 0.12s, color 0.12s; }
+  .map-zoom-btn:hover { background: #f0f3f8; color: #1a2233; }
+
+  /* Tooltip */
+  .map-tooltip { position: absolute; background: #fff; border-radius: 14px; padding: 16px 18px 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); display: none; z-index: 600; pointer-events: auto; transform: translate(-50%, calc(-100% - 16px)); min-width: 240px; }
+  .map-tooltip.visible { display: block; }
+  .map-tooltip-header { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 16px; color: #1a2233; margin-bottom: 12px; }
+  .map-tooltip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .map-tooltip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .map-tooltip-card { background: #f5f7fb; border-radius: 10px; padding: 10px 13px; }
+  .map-tooltip-label { font-size: 11.5px; color: #9aa3b5; margin-bottom: 3px; }
+  .map-tooltip-value { font-size: 19px; font-weight: 500; color: #1a2233; }
+  .map-tooltip-btn { width: 100%; padding: 8px 0; border-radius: 8px; border: 1px solid #e6ebf2; background: #fff; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.12s, border-color 0.12s; }
+  .map-tooltip-btn:hover { background: #f5f7fb; border-color: #c8d0e0; color: #1a2233; }
+  .tooltip-remove-btn { width:32px;height:32px;border:none;background:#f5f7fb;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9aa3b5;flex-shrink:0;transition:background 0.12s,color 0.12s; }
+  .tooltip-remove-btn:hover { background:#fdecea;color:#d83a52; }
+
+  /* Radius editor */
+  .radius-editor { position: absolute; background: #fff; border-radius: 14px; padding: 18px 20px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.16); z-index: 700; min-width: 260px; display: none; }
+  .radius-editor.visible { display: block; }
+  .radius-editor-header { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
+  .radius-editor-title { font-weight: 600; font-size: 16px; color: #1a2233; flex: 1; }
+  .radius-editor-close { width: 26px; height: 26px; border: none; background: #f5f7fb; border-radius: 6px; cursor: pointer; font-size: 16px; color: #6b7a99; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .radius-editor-close:hover { background: #e6ebf2; }
+  .radius-editor-body { margin-bottom: 28px; }
+  .radius-editor-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .radius-editor-row label { font-size: 14.5px; color: #6b7a99; }
+  .radius-editor-row .radius-val { font-size: 18px; font-weight: 600; color: #1a2233; }
+  .radius-slider { width: 100%; margin: 12px 0; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: #e6ebf2; outline: none; cursor: pointer; display: block; }
+  .radius-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(43,108,223,0.40); cursor: pointer; transition: transform 0.1s; margin-top: -8.5px; }
+  .radius-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+  .radius-slider::-webkit-slider-runnable-track { height: 5px; border-radius: 3px; }
+  .radius-slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(43,108,223,0.40); cursor: pointer; }
+  .radius-slider::-moz-range-track { height: 5px; border-radius: 3px; background: #e6ebf2; }
+  .radius-slider::-moz-range-progress { height: 5px; border-radius: 3px; background: #2b6cdf; }
+  .radius-editor-footer { display: flex; gap: 8px; }
+  .radius-editor-footer button { flex: 1; padding: 8px 0; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e6ebf2; }
+  .radius-btn-cancel { background: #fff; color: #4a5878; }
+  .radius-btn-cancel:hover { background: #f5f7fb; }
+  .radius-btn-apply { background: #2b6cdf; color: #fff; border-color: #2b6cdf; }
+  .radius-btn-apply:hover { background: #2057bd; }
+
+  /* Stats dot */
+  .stats-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Drag ghost */
+  .drag-ghost { position: fixed; top: -9999px; left: -9999px; background: #fff; border-radius: 6px; padding: 6px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #1a2233; pointer-events: none; z-index: 9999; white-space: nowrap; }
+  .drag-ghost .pin-icon { color: #6b7a99; }
+  .segment-row[draggable="true"] { cursor: grab; }
+  .segment-row[draggable="true"]:active { cursor: grabbing; }
+  .segment-row.dragging { opacity: 0.4; }
+  .map-panel.drag-over { outline: 2px dashed #2b6cdf; outline-offset: -4px; background: #eaf1fc44; }
+  .map-panel.drag-over #map { opacity: 0.85; }
+  .map-drop-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border: 2px dashed #2b6cdf; border-radius: 10px; padding: 16px 28px; font-size: 14px; font-weight: 500; color: #2b6cdf; pointer-events: none; z-index: 600; display: none; white-space: nowrap; }
+  .map-panel.drag-over .map-drop-hint { display: block; }
+
+  /* Leaflet overrides */
+  .leaflet-container { font-family: inherit; background: #fff; border-radius: 10px; }
+  .leaflet-control-attribution { font-size: 10px; }
+
+  /* Scrollbar */
+  .segments-list::-webkit-scrollbar { width: 8px; }
+  .segments-list::-webkit-scrollbar-track { background: transparent; }
+  .segments-list::-webkit-scrollbar-thumb { background: #d2d8e3; border-radius: 4px; }
+  .segments-list::-webkit-scrollbar-thumb:hover { background: #b0b9cc; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Top bar -->
+  <div class="topbar">
+    <button class="menu-btn" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="logo">
+      <img src="avatar-logo.png" style="width:28px;height:28px;object-fit:contain;" alt="Logo" />
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="breadcrumb">
+      <span class="crumb">Home</span><span class="sep">/</span>
+      <span class="crumb">Mars</span><span class="sep">/</span>
+      <span class="crumb">United States</span><span class="sep">/</span>
+      <span class="crumb">Mars - US - Wrigley</span><span class="sep">/</span>
+      <span class="crumb active">Audience Builder
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+    </div>
+    <div style="display:flex;align-items:center;gap:2px;background:#f0f3f8;border-radius:8px;padding:3px;">
+      <a href="index.html" style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;color:#6b7a99;">Index 1</a>
+      <a href="index2.html" style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;background:#fff;color:#1a2233;box-shadow:0 1px 3px rgba(0,0,0,0.10);">Index 2</a>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" aria-label="More">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+      </button>
+      <button class="icon-btn help-btn">
+        Help
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <div class="avatar">A</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <button class="back-btn" aria-label="Back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="audience-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="header-info">
+      <div class="title-row">
+        <h1>VIP Rewards Customers</h1>
+        <button class="edit-btn" aria-label="Edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+      </div>
+      <div class="meta">
+        <span>Mars - US - Wrigley</span>
+        <span class="sep">|</span>
+        <span class="meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          Mobility
+        </span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-text">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Adsquare Audience
+      </button>
+      <button class="btn btn-icon" aria-label="More">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+      </button>
+      <button class="btn btn-outline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Export
+      </button>
+      <button class="btn btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Apply to Campaign
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active">POI</div>
+    <div class="tab">Audience</div>
+    <div class="tab">Insights</div>
+    <div class="tab">Configuration</div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <!-- Left panel: Segments -->
+    <div class="panel">
+      <div class="left-tabs">
+        <div class="left-tab active">Segments</div>
+        <div class="left-tab">Suggestions</div>
+      </div>
+      <div class="search-wrap">
+        <input type="text" class="search-input" placeholder="Search segments" id="segmentSearch" />
+      </div>
+      <div class="segments-list" id="segmentsList"></div>
+    </div>
+
+    <!-- Map -->
+    <div class="panel map-panel">
+      <div id="map"></div>
+      <div class="map-drop-hint" id="mapDropHint">Drop to add segment</div>
+      <div class="map-tooltip" id="mapTooltip"></div>
+      <div class="radius-editor" id="radiusEditor">
+        <div class="radius-editor-header">
+          <span class="stats-dot" id="radiusEditorDot"></span>
+          <span class="radius-editor-title" id="radiusEditorTitle"></span>
+          <button class="radius-editor-close" id="radiusEditorClose">×</button>
+        </div>
+        <div class="radius-editor-body">
+          <div class="radius-editor-row">
+            <label>Radius for all locations</label>
+            <span class="radius-val" id="radiusValDisplay">200m</span>
+          </div>
+          <input type="range" class="radius-slider" id="radiusSlider" min="50" max="800" step="10" value="200" />
+        </div>
+        <div class="radius-editor-footer">
+          <button class="radius-btn-cancel" id="radiusBtnCancel">Cancel</button>
+          <button class="radius-btn-apply" id="radiusBtnApply">Apply</button>
+        </div>
+      </div>
+      <div class="map-legend">
+        <div class="legend-bar"></div>
+        <div class="legend-labels">
+          <span>0</span><span>50%</span><span>100%</span>
+        </div>
+      </div>
+      <!-- On-map aggregate metrics bar -->
+      <div class="map-metrics-bar hidden" id="mapMetricsBar">
+        <div class="map-metrics-segments" id="mapMetricsSegments"></div>
+        <div class="map-metrics-divider"></div>
+        <div class="map-metrics-totals">
+          <div class="map-metric-item">
+            <span class="map-metric-label">Audience Size</span>
+            <span class="map-metric-value" id="metricAudience">—</span>
+          </div>
+          <div class="map-metric-sep"></div>
+          <div class="map-metric-item">
+            <span class="map-metric-label">Approx. Frames</span>
+            <span class="map-metric-value" id="metricFrames">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="map-zoom">
+        <button class="map-zoom-btn" id="zoomIn" aria-label="Zoom in">+</button>
+        <button class="map-zoom-btn" id="zoomOut" aria-label="Zoom out">−</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ------------ Segment tree ------------ */
+const segmentTree = [
+  { id: "shops", label: "Shops", children: [
+    { id: "shops_clothing", label: "Clothing & Apparel", children: [
+      { id: "shops_clothing_zara", label: "Zara", leaf: true },
+      { id: "shops_clothing_hm", label: "H&M", leaf: true },
+      { id: "shops_clothing_gap", label: "Gap", leaf: true },
+      { id: "shops_clothing_uniqlo", label: "Uniqlo", leaf: true },
+    ]},
+    { id: "shops_electronics", label: "Electronics", children: [
+      { id: "shops_electronics_apple", label: "Apple Store", leaf: true },
+      { id: "shops_electronics_bestbuy", label: "Best Buy", leaf: true },
+      { id: "shops_electronics_samsung", label: "Samsung", leaf: true },
+    ]},
+    { id: "shops_pharmacy", label: "Pharmacy", children: [
+      { id: "shops_pharmacy_cvs", label: "CVS", leaf: true },
+      { id: "shops_pharmacy_walgreens", label: "Walgreens", leaf: true },
+      { id: "shops_pharmacy_rite_aid", label: "Rite Aid", leaf: true },
+    ]},
+    { id: "shops_convenience", label: "Convenience", children: [
+      { id: "shops_convenience_7eleven", label: "7-Eleven", leaf: true },
+      { id: "shops_convenience_wawa", label: "Wawa", leaf: true },
+    ]},
+  ]},
+  { id: "bus_stops", label: "Bus Stops", children: [
+    { id: "bus_stops_downtown", label: "Downtown Routes", children: [
+      { id: "bus_stops_route_1", label: "Route 1 — Market St", leaf: true },
+      { id: "bus_stops_route_5", label: "Route 5 — Fulton St", leaf: true },
+      { id: "bus_stops_route_14", label: "Route 14 — Mission St", leaf: true },
+    ]},
+    { id: "bus_stops_express", label: "Express Routes", children: [
+      { id: "bus_stops_express_38r", label: "38R — Geary Rapid", leaf: true },
+      { id: "bus_stops_express_49", label: "49 — Van Ness/Mission", leaf: true },
+    ]},
+    { id: "bus_stops_night", label: "Night Owl Routes", children: [
+      { id: "bus_stops_owl_n", label: "N-Owl", leaf: true },
+      { id: "bus_stops_owl_l", label: "L-Owl", leaf: true },
+    ]},
+  ]},
+  { id: "restaurants", label: "Restaurants", children: [
+    { id: "fast_food", label: "Fast Food", children: [
+      { id: "chick_fil_a", label: "Chick Fil A", leaf: true },
+      { id: "wendys", label: "Wendys", leaf: true },
+      { id: "mcdonalds", label: "McDonalds", children: [
+        { id: "mcdonalds_drive_thru", label: "McDonalds Drive Thru", leaf: true },
+        { id: "mcdonalds_walk_in", label: "McDonalds Walk In", leaf: true },
+      ]},
+      { id: "burger_king", label: "Burger King", leaf: true },
+      { id: "taco_bell", label: "Taco Bell", leaf: true },
+    ]},
+    { id: "casual_dining", label: "Casual Dining", children: [
+      { id: "olive_garden", label: "Olive Garden", leaf: true },
+      { id: "applebees", label: "Applebee's", leaf: true },
+      { id: "chilis", label: "Chili's", leaf: true },
+    ]},
+    { id: "cafes", label: "Cafes & Coffee", children: [
+      { id: "starbucks", label: "Starbucks", leaf: true },
+      { id: "peets", label: "Peet's Coffee", leaf: true },
+      { id: "blue_bottle", label: "Blue Bottle Coffee", leaf: true },
+      { id: "philz", label: "Philz Coffee", leaf: true },
+    ]},
+    { id: "pizza", label: "Pizza", children: [
+      { id: "pizza_hut", label: "Pizza Hut", leaf: true },
+      { id: "dominos", label: "Domino's", leaf: true },
+      { id: "little_caesars", label: "Little Caesars", leaf: true },
+    ]},
+  ]},
+  { id: "grocery", label: "Grocery Stores", children: [
+    { id: "grocery_supermarket", label: "Supermarkets", children: [
+      { id: "grocery_safeway", label: "Safeway", leaf: true },
+      { id: "grocery_kroger", label: "Kroger", leaf: true },
+      { id: "grocery_publix", label: "Publix", leaf: true },
+      { id: "grocery_albertsons", label: "Albertsons", leaf: true },
+    ]},
+    { id: "grocery_premium", label: "Premium & Organic", children: [
+      { id: "grocery_wholefoods", label: "Whole Foods", leaf: true },
+      { id: "grocery_sprouts", label: "Sprouts", leaf: true },
+      { id: "grocery_traderjoes", label: "Trader Joe's", leaf: true },
+    ]},
+    { id: "grocery_discount", label: "Discount & Bulk", children: [
+      { id: "grocery_costco", label: "Costco", leaf: true },
+      { id: "grocery_aldi", label: "Aldi", leaf: true },
+      { id: "grocery_lidl", label: "Lidl", leaf: true },
+    ]},
+  ]},
+  { id: "train", label: "Train Stations", children: [
+    { id: "train_bart", label: "BART", children: [
+      { id: "train_bart_powell", label: "Powell St Station", leaf: true },
+      { id: "train_bart_montgomery", label: "Montgomery St Station", leaf: true },
+      { id: "train_bart_civic", label: "Civic Center Station", leaf: true },
+      { id: "train_bart_embarcadero", label: "Embarcadero Station", leaf: true },
+    ]},
+    { id: "train_caltrain", label: "Caltrain", children: [
+      { id: "train_caltrain_sf", label: "SF 4th & King", leaf: true },
+      { id: "train_caltrain_22nd", label: "22nd Street", leaf: true },
+      { id: "train_caltrain_bayshore", label: "Bayshore", leaf: true },
+    ]},
+    { id: "train_muni", label: "Muni Metro", children: [
+      { id: "train_muni_castro", label: "Castro Station", leaf: true },
+      { id: "train_muni_church", label: "Church Station", leaf: true },
+      { id: "train_muni_vanness", label: "Van Ness Station", leaf: true },
+    ]},
+  ]},
+  { id: "crosswalks", label: "Crosswalks", children: [
+    { id: "crosswalks_signalized", label: "Signalized", children: [
+      { id: "crosswalks_sig_market", label: "Market St Crossings", leaf: true },
+      { id: "crosswalks_sig_mission", label: "Mission St Crossings", leaf: true },
+      { id: "crosswalks_sig_van_ness", label: "Van Ness Crossings", leaf: true },
+    ]},
+    { id: "crosswalks_school", label: "School Zone", children: [
+      { id: "crosswalks_school_elem", label: "Elementary Schools", leaf: true },
+      { id: "crosswalks_school_mid", label: "Middle Schools", leaf: true },
+      { id: "crosswalks_school_high", label: "High Schools", leaf: true },
+    ]},
+    { id: "crosswalks_midblock", label: "Mid-Block", children: [
+      { id: "crosswalks_midblock_painted", label: "Painted Crosswalks", leaf: true },
+      { id: "crosswalks_midblock_raised", label: "Raised Crosswalks", leaf: true },
+    ]},
+  ]},
+  { id: "airports", label: "Airports", children: [
+    { id: "airports_major", label: "Major Airports", children: [
+      { id: "airports_sfo", label: "SFO — San Francisco Intl", leaf: true },
+      { id: "airports_oak", label: "OAK — Oakland Intl", leaf: true },
+      { id: "airports_sjc", label: "SJC — San Jose Intl", leaf: true },
+    ]},
+    { id: "airports_zones", label: "Airport Zones", children: [
+      { id: "airports_zone_departures", label: "Departures Drop-off", leaf: true },
+      { id: "airports_zone_arrivals", label: "Arrivals Pick-up", leaf: true },
+      { id: "airports_zone_parking", label: "Long-Term Parking", leaf: true },
+      { id: "airports_zone_rental", label: "Car Rental Centers", leaf: true },
+    ]},
+  ]},
+  { id: "car_parks", label: "Car Parks", children: [
+    { id: "car_parks_street", label: "Street Parking", children: [
+      { id: "car_parks_metered", label: "Metered Spots", leaf: true },
+      { id: "car_parks_permit", label: "Permit Zones", leaf: true },
+    ]},
+    { id: "car_parks_structure", label: "Parking Structures", children: [
+      { id: "car_parks_5th_mission", label: "5th & Mission Garage", leaf: true },
+      { id: "car_parks_union_square", label: "Union Square Garage", leaf: true },
+      { id: "car_parks_embarcadero", label: "Embarcadero Center", leaf: true },
+      { id: "car_parks_civic", label: "Civic Center Garage", leaf: true },
+    ]},
+    { id: "car_parks_surface", label: "Surface Lots", children: [
+      { id: "car_parks_lot_sf1", label: "SoMa Surface Lot", leaf: true },
+      { id: "car_parks_lot_sf2", label: "Tenderloin Surface Lot", leaf: true },
+    ]},
+  ]},
+];
+
+const segmentPOIs = {
+  chick_fil_a: [[37.7990,-122.4115,220,0.9],[37.7965,-122.4070,200,0.7],[37.7935,-122.4040,240,0.85],[37.7820,-122.4310,230,0.6],[37.7820,-122.4145,220,0.5],[37.7895,-122.4035,210,0.75],[37.7790,-122.3995,250,0.8],[37.7755,-122.3955,230,0.7],[37.7715,-122.4105,240,0.65]],
+  wendys: [[37.7855,-122.4215,180,0.7],[37.7920,-122.4130,170,0.6],[37.7780,-122.4030,200,0.55],[37.7700,-122.4080,190,0.75]],
+  mcdonalds_drive_thru: [[37.7975,-122.4135,160,0.7],[37.7945,-122.4055,170,0.6],[37.7800,-122.4275,180,0.55],[37.7820,-122.4175,170,0.7],[37.7740,-122.4070,180,0.6]],
+  mcdonalds_walk_in: [[37.7900,-122.4185,150,0.65],[37.7860,-122.4090,160,0.7],[37.7755,-122.4185,170,0.55],[37.7770,-122.3990,180,0.6],[37.7895,-122.3955,160,0.5]],
+  burger_king: [[37.7870,-122.4160,175,0.65],[37.7830,-122.4080,165,0.6],[37.7750,-122.4120,180,0.7]],
+  taco_bell: [[37.7910,-122.4095,160,0.6],[37.7780,-122.4200,170,0.55],[37.7720,-122.4050,165,0.65]],
+  olive_garden: [[37.7860,-122.4230,190,0.7],[37.7790,-122.4060,200,0.65]],
+  applebees: [[37.7920,-122.4020,185,0.6],[37.7750,-122.4280,195,0.55]],
+  chilis: [[37.7840,-122.4150,180,0.65],[37.7760,-122.4070,175,0.6]],
+  starbucks: [[37.7950,-122.4090,130,0.8],[37.7920,-122.4050,125,0.75],[37.7870,-122.4180,135,0.7],[37.7810,-122.4110,130,0.65],[37.7780,-122.4250,125,0.7],[37.7730,-122.4090,130,0.6]],
+  peets: [[37.7900,-122.4130,130,0.7],[37.7840,-122.4070,125,0.65],[37.7760,-122.4160,130,0.6]],
+  blue_bottle: [[37.7890,-122.4060,120,0.75],[37.7820,-122.4120,115,0.7]],
+  philz: [[37.7940,-122.4100,125,0.7],[37.7810,-122.4180,120,0.65],[37.7740,-122.4110,125,0.6]],
+  pizza_hut: [[37.7870,-122.4090,160,0.65],[37.7790,-122.4220,155,0.6]],
+  dominos: [[37.7910,-122.4145,155,0.6],[37.7760,-122.4090,160,0.55],[37.7720,-122.4180,155,0.6]],
+  little_caesars: [[37.7850,-122.4200,150,0.55],[37.7780,-122.4040,145,0.6]],
+  shops_clothing_zara: [[37.7870,-122.4070,200,0.8],[37.7900,-122.4020,195,0.75],[37.7830,-122.4150,205,0.7]],
+  shops_clothing_hm: [[37.7880,-122.4080,195,0.75],[37.7850,-122.4030,190,0.7]],
+  shops_clothing_gap: [[37.7860,-122.4060,185,0.7],[37.7820,-122.4190,180,0.65]],
+  shops_clothing_uniqlo: [[37.7895,-122.4045,190,0.75],[37.7840,-122.4120,185,0.7]],
+  shops_electronics_apple: [[37.7910,-122.4030,210,0.9],[37.7780,-122.4080,205,0.85]],
+  shops_electronics_bestbuy: [[37.7760,-122.4240,220,0.8],[37.7830,-122.4300,215,0.75]],
+  shops_electronics_samsung: [[37.7890,-122.4050,195,0.75],[37.7820,-122.4140,190,0.7]],
+  shops_pharmacy_cvs: [[37.7940,-122.4100,160,0.7],[37.7880,-122.4160,155,0.65],[37.7800,-122.4070,160,0.6],[37.7740,-122.4200,155,0.65]],
+  shops_pharmacy_walgreens: [[37.7910,-122.4070,155,0.7],[37.7860,-122.4130,150,0.65],[37.7780,-122.4210,155,0.6]],
+  shops_pharmacy_rite_aid: [[37.7850,-122.4090,150,0.65],[37.7760,-122.4150,145,0.6]],
+  shops_convenience_7eleven: [[37.7930,-122.4110,130,0.65],[37.7870,-122.4060,125,0.6],[37.7800,-122.4180,130,0.55],[37.7730,-122.4080,125,0.6]],
+  shops_convenience_wawa: [[37.7900,-122.4140,135,0.6],[37.7820,-122.4080,130,0.55]],
+  bus_stops_route_1: [[37.7935,-122.4180,100,0.5],[37.7895,-122.4115,95,0.55],[37.7855,-122.4055,100,0.5]],
+  bus_stops_route_5: [[37.7920,-122.4160,100,0.5],[37.7880,-122.4100,95,0.55],[37.7840,-122.4040,100,0.5]],
+  bus_stops_route_14: [[37.7910,-122.4080,100,0.55],[37.7870,-122.4020,95,0.5],[37.7830,-122.3970,100,0.5]],
+  bus_stops_express_38r: [[37.7960,-122.4200,110,0.6],[37.7920,-122.4130,105,0.55],[37.7880,-122.4070,110,0.5]],
+  bus_stops_express_49: [[37.7940,-122.4090,110,0.55],[37.7890,-122.4140,105,0.6],[37.7840,-122.4190,110,0.55]],
+  bus_stops_owl_n: [[37.7850,-122.4280,115,0.5],[37.7820,-122.4210,110,0.45]],
+  bus_stops_owl_l: [[37.7770,-122.4150,115,0.5],[37.7740,-122.4090,110,0.45]],
+  train_bart_powell: [[37.7844,-122.4080,260,0.9]],
+  train_bart_montgomery: [[37.7890,-122.4015,255,0.85]],
+  train_bart_civic: [[37.7796,-122.4148,250,0.8]],
+  train_bart_embarcadero: [[37.7929,-122.3963,260,0.85]],
+  train_caltrain_sf: [[37.7760,-122.3950,270,0.85]],
+  train_caltrain_22nd: [[37.7575,-122.3917,250,0.75]],
+  train_caltrain_bayshore: [[37.7092,-122.4018,240,0.7]],
+  train_muni_castro: [[37.7626,-122.4350,200,0.75]],
+  train_muni_church: [[37.7655,-122.4283,195,0.7]],
+  train_muni_vanness: [[37.7749,-122.4196,200,0.7]],
+  crosswalks_sig_market: [[37.7870,-122.4080,90,0.4],[37.7880,-122.4050,85,0.45],[37.7860,-122.4110,90,0.4]],
+  crosswalks_sig_mission: [[37.7840,-122.4060,90,0.4],[37.7820,-122.4090,85,0.35]],
+  crosswalks_sig_van_ness: [[37.7800,-122.4196,90,0.4],[37.7830,-122.4196,85,0.4],[37.7770,-122.4196,90,0.35]],
+  crosswalks_school_elem: [[37.7900,-122.4200,100,0.45],[37.7750,-122.4100,95,0.4]],
+  crosswalks_school_mid: [[37.7840,-122.4300,100,0.4],[37.7710,-122.4180,95,0.4]],
+  crosswalks_school_high: [[37.7780,-122.4250,100,0.45],[37.7860,-122.4020,95,0.4]],
+  crosswalks_midblock_painted: [[37.7870,-122.4070,80,0.35],[37.7840,-122.4120,75,0.35]],
+  crosswalks_midblock_raised: [[37.7860,-122.4095,80,0.4],[37.7890,-122.4050,75,0.35]],
+  airports_sfo: [[37.6213,-122.3790,600,0.9]],
+  airports_oak: [[37.7213,-122.2208,580,0.85]],
+  airports_sjc: [[37.3639,-121.9289,570,0.8]],
+  airports_zone_departures: [[37.6220,-122.3810,300,0.75],[37.7220,-122.2220,280,0.7]],
+  airports_zone_arrivals: [[37.6205,-122.3780,300,0.8],[37.7205,-122.2195,280,0.75]],
+  airports_zone_parking: [[37.6195,-122.3830,350,0.7],[37.7195,-122.2240,330,0.65]],
+  airports_zone_rental: [[37.6230,-122.3770,280,0.7],[37.7230,-122.2180,260,0.65]],
+  car_parks_metered: [[37.7880,-122.4060,110,0.55],[37.7850,-122.4100,105,0.5],[37.7910,-122.4030,110,0.5]],
+  car_parks_permit: [[37.7830,-122.4140,115,0.5],[37.7800,-122.4080,110,0.45]],
+  car_parks_5th_mission: [[37.7816,-122.4051,190,0.7]],
+  car_parks_union_square: [[37.7880,-122.4074,185,0.75]],
+  car_parks_embarcadero: [[37.7952,-122.3965,180,0.7]],
+  car_parks_civic: [[37.7795,-122.4185,185,0.65]],
+  car_parks_lot_sf1: [[37.7760,-122.4060,160,0.55],[37.7740,-122.4090,155,0.5]],
+  car_parks_lot_sf2: [[37.7820,-122.4160,155,0.5],[37.7800,-122.4200,150,0.45]],
+  grocery_safeway: [[37.7755,-122.4250,200,0.7],[37.7820,-122.4350,210,0.65]],
+  grocery_kroger: [[37.7790,-122.4400,195,0.65],[37.7840,-122.4280,200,0.6]],
+  grocery_publix: [[37.7720,-122.4310,190,0.6],[37.7770,-122.4170,185,0.55]],
+  grocery_albertsons: [[37.7800,-122.4330,195,0.65],[37.7860,-122.4260,190,0.6]],
+  grocery_wholefoods: [[37.7920,-122.4090,210,0.8],[37.7780,-122.4380,205,0.75]],
+  grocery_sprouts: [[37.7750,-122.4420,195,0.7],[37.7840,-122.4310,190,0.65]],
+  grocery_traderjoes: [[37.7890,-122.4070,200,0.75],[37.7760,-122.4300,195,0.7]],
+  grocery_costco: [[37.7700,-122.4450,280,0.8],[37.7650,-122.4380,275,0.75]],
+  grocery_aldi: [[37.7730,-122.4320,185,0.65],[37.7810,-122.4390,180,0.6]],
+  grocery_lidl: [[37.7760,-122.4360,185,0.6],[37.7790,-122.4430,180,0.55]],
+};
+
+const colorPalette = [
+  { stroke: "#2b6cdf", fill: "#2b6cdf" },
+  { stroke: "#21a366", fill: "#21a366" },
+  { stroke: "#e26a2c", fill: "#e26a2c" },
+  { stroke: "#9c4dcc", fill: "#9c4dcc" },
+  { stroke: "#d83a52", fill: "#d83a52" },
+];
+
+const state = {
+  expanded: new Set(["restaurants", "fast_food", "mcdonalds"]),
+  selected: new Set(["chick_fil_a"]),
+  selectionOrder: ["chick_fil_a"],
+};
+
+/* ------------ Render segment tree ------------ */
+function renderSegments() {
+  const container = document.getElementById("segmentsList");
+  container.innerHTML = "";
+  segmentTree.forEach(node => container.appendChild(renderNode(node, 0)));
+}
+
+function countSelected(node) {
+  if (node.leaf) return state.selected.has(node.id) ? 1 : 0;
+  return (node.children || []).reduce((s, c) => s + countSelected(c), 0);
+}
+
+function renderNode(node, depth) {
+  const wrap = document.createElement("div");
+  wrap.className = "segment-node";
+  wrap.dataset.depth = depth;
+
+  const row = document.createElement("div");
+  row.className = "segment-row";
+  row.dataset.depth = depth;
+  if (state.selected.has(node.id)) row.classList.add("selected");
+
+  const hasChildren = node.children && node.children.length > 0;
+  const isExpanded = state.expanded.has(node.id);
+
+  if (depth === 0) {
+    const chevron = document.createElement("span");
+    chevron.className = "chevron" + (hasChildren ? "" : " placeholder") + (isExpanded ? " expanded" : "");
+    chevron.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+    row.appendChild(chevron);
+  } else {
+    const chevron = document.createElement("span");
+    if (hasChildren && depth <= 2) {
+      chevron.className = "chevron-sub" + (isExpanded ? "" : " collapsed");
+      chevron.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+    } else {
+      chevron.className = "chevron-sub placeholder";
+      chevron.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="transparent" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+    }
+    row.appendChild(chevron);
+
+    if (depth >= 2) {
+      const pin = document.createElement("span");
+      pin.className = "pin";
+      pin.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+      row.appendChild(pin);
+    }
+  }
+
+  const labelEl = document.createElement("span");
+  labelEl.textContent = node.label;
+  row.appendChild(labelEl);
+
+  if (depth === 0) {
+    const count = countSelected(node);
+    if (count > 0) {
+      const pill = document.createElement("span");
+      pill.style.cssText = "margin-left:auto;background:#eaf1fc;color:#2b6cdf;font-size:13px;font-weight:500;border-radius:20px;padding:5px 13px;white-space:nowrap;";
+      pill.textContent = count + " selected";
+      row.appendChild(pill);
+    }
+  }
+
+  row.dataset.nodeId = node.id;
+  if (node.leaf && segmentPOIs[node.id]) makeDraggable(row, node);
+
+  row.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (hasChildren) {
+      if (state.expanded.has(node.id)) state.expanded.delete(node.id);
+      else state.expanded.add(node.id);
+      renderSegments();
+    } else {
+      toggleSelection(node.id);
+    }
+  });
+
+  wrap.appendChild(row);
+  if (hasChildren && isExpanded) {
+    const childWrap = document.createElement("div");
+    childWrap.className = "segment-children";
+    node.children.forEach(child => childWrap.appendChild(renderNode(child, depth + 1)));
+    wrap.appendChild(childWrap);
+  }
+  return wrap;
+}
+
+function toggleSelection(id) {
+  if (!segmentPOIs[id]) return;
+  if (state.selected.has(id)) {
+    state.selected.delete(id);
+    state.selectionOrder = state.selectionOrder.filter(x => x !== id);
+  } else {
+    state.selected.add(id);
+    state.selectionOrder.push(id);
+  }
+  renderSegments();
+  renderMap();
+  renderMetricsBar();
+}
+
+/* ------------ Map ------------ */
+const map = L.map("map", {
+  center: [37.7855, -122.4140],
+  zoom: 14,
+  zoomControl: false,
+  attributionControl: false,
+});
+L.control.attribution({ position: "bottomright", prefix: false }).addTo(map);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>',
+  maxZoom: 19,
+}).addTo(map);
+
+const circleLayer = L.layerGroup().addTo(map);
+const tooltipEl = document.getElementById("mapTooltip");
+
+function colorForSegment(id) {
+  const idx = state.selectionOrder.indexOf(id);
+  return colorPalette[idx % colorPalette.length];
+}
+
+const segmentRadiusScale = {};
+
+function effectiveRadius(id, baseRadius) {
+  return Math.round(baseRadius * (segmentRadiusScale[id] || 1.0));
+}
+
+function defaultRadiusForSegment(id) {
+  const pois = segmentPOIs[id] || [];
+  if (!pois.length) return 200;
+  return Math.round(pois.reduce((s, p) => s + p[2], 0) / pois.length);
+}
+
+function renderMap() {
+  circleLayer.clearLayers();
+  state.selectionOrder.forEach(id => {
+    const pois = segmentPOIs[id];
+    if (!pois) return;
+    const { stroke, fill } = colorForSegment(id);
+    pois.forEach(([lat, lng, radius, intensity]) => {
+      const r = effectiveRadius(id, radius);
+      const circle = L.circle([lat, lng], {
+        radius: r,
+        color: stroke,
+        weight: 2,
+        fillColor: fill,
+        fillOpacity: 0.10 + intensity * 0.18,
+      });
+      circle.on("click", (ev) => { L.DomEvent.stopPropagation(ev); showTooltip(ev, id); });
+      circle.addTo(circleLayer);
+    });
+  });
+}
+
+function findLabelById(id, nodes = segmentTree) {
+  for (const n of nodes) {
+    if (n.id === id) return n.label;
+    if (n.children && n.children.length) {
+      const r = findLabelById(id, n.children);
+      if (r !== null) return r;
+    }
+  }
+  return nodes === segmentTree ? id : null;
+}
+
+let tooltipCurrentId = null;
+
+function positionTooltip(ev) {
+  const point = map.latLngToContainerPoint(ev.latlng);
+  const mapRect = document.getElementById("map").getBoundingClientRect();
+  const panelRect = tooltipEl.parentElement.getBoundingClientRect();
+  tooltipEl.style.left = (point.x + (mapRect.left - panelRect.left)) + "px";
+  tooltipEl.style.top = (point.y + (mapRect.top - panelRect.top)) + "px";
+}
+
+function showTooltip(ev, id) {
+  tooltipCurrentId = id;
+  const label = findLabelById(id);
+  const color = colorForSegment(id);
+  const pois = segmentPOIs[id] || [];
+  let audSum = 0, framesSum = 0;
+  pois.forEach(([,,r,i]) => {
+    const er = effectiveRadius(id, r);
+    audSum += Math.round(er * i * 1.4);
+    framesSum += Math.round(er * i * 0.6);
+  });
+  const audVal = pois.length ? (audSum / 1000).toFixed(1) + "m" : "—";
+  const framesVal = pois.length ? (framesSum / 1000).toFixed(1) + "k" : "—";
+
+  tooltipEl.innerHTML = `
+    <div class="map-tooltip-header">
+      <span class="map-tooltip-dot" style="background:${color.fill}"></span>
+      <span style="flex:1">${label}</span>
+      <button id="tooltipRemoveBtn" class="tooltip-remove-btn" title="Remove segment">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+    <div class="map-tooltip-grid">
+      <div class="map-tooltip-card"><div class="map-tooltip-label">Audience Size</div><div class="map-tooltip-value">${audVal}</div></div>
+      <div class="map-tooltip-card"><div class="map-tooltip-label">Approx. Frames</div><div class="map-tooltip-value">${framesVal}</div></div>
+    </div>
+    <button class="map-tooltip-btn" id="tooltipRadiusBtn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><circle cx="9" cy="8" r="2.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="2.5" fill="currentColor" stroke="none"/></svg>
+      Change Radius
+    </button>`;
+
+  document.getElementById("tooltipRadiusBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    hideTooltip();
+    openRadiusEditorCentered(id);
+  });
+
+  document.getElementById("tooltipRemoveBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    hideTooltip();
+    state.selected.delete(id);
+    state.selectionOrder = state.selectionOrder.filter(x => x !== id);
+    renderSegments();
+    renderMap();
+    renderMetricsBar();
+  });
+
+  tooltipEl.classList.add("visible");
+  positionTooltip(ev);
+}
+
+function hideTooltip() {
+  tooltipEl.classList.remove("visible");
+  tooltipCurrentId = null;
+}
+
+map.on("click", hideTooltip);
+
+/* ------------ Radius Editor ------------ */
+const radiusEditor = document.getElementById("radiusEditor");
+const radiusSlider = document.getElementById("radiusSlider");
+const radiusValDisplay = document.getElementById("radiusValDisplay");
+let radiusEditorId = null;
+let radiusEditorOriginalScale = 1.0;
+
+function openRadiusEditorCentered(id) {
+  const left = tooltipEl.style.left;
+  const top = tooltipEl.style.top;
+  openRadiusEditorAt(id, left, top);
+}
+
+function openRadiusEditorAt(id, left, top) {
+  hideTooltip();
+  radiusEditorId = id;
+  radiusEditorOriginalScale = segmentRadiusScale[id] || 1.0;
+  const color = colorForSegment(id);
+  const label = findLabelById(id);
+  const baseRadius = defaultRadiusForSegment(id);
+  const currentRadius = Math.round(baseRadius * radiusEditorOriginalScale);
+
+  document.getElementById("radiusEditorDot").style.background = color.fill;
+  document.getElementById("radiusEditorTitle").textContent = label;
+  radiusSlider.min = 50;
+  radiusSlider.max = 800;
+  radiusSlider.step = 10;
+  radiusSlider.value = currentRadius;
+  radiusValDisplay.textContent = currentRadius + "m";
+  updateSliderFill(radiusSlider);
+
+  radiusEditor.style.left = left;
+  radiusEditor.style.top = top;
+  radiusEditor.style.transform = "translate(-50%, calc(-100% - 16px))";
+  radiusEditor.classList.add("visible");
+}
+
+function updateSliderFill(slider) {
+  const pct = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+  slider.style.background = `linear-gradient(to right, #2b6cdf ${pct}%, #e6ebf2 ${pct}%)`;
+}
+
+radiusSlider.addEventListener("input", () => {
+  updateSliderFill(radiusSlider);
+  const newRadius = parseInt(radiusSlider.value);
+  radiusValDisplay.textContent = newRadius + "m";
+  if (radiusEditorId) {
+    const base = defaultRadiusForSegment(radiusEditorId);
+    segmentRadiusScale[radiusEditorId] = newRadius / base;
+    renderMap();
+    renderMetricsBar();
+  }
+});
+
+document.getElementById("radiusEditorClose").addEventListener("click", cancelRadiusEditor);
+document.getElementById("radiusBtnCancel").addEventListener("click", cancelRadiusEditor);
+document.getElementById("radiusBtnApply").addEventListener("click", () => {
+  radiusEditor.classList.remove("visible");
+  radiusEditorId = null;
+});
+
+function cancelRadiusEditor() {
+  if (radiusEditorId) {
+    segmentRadiusScale[radiusEditorId] = radiusEditorOriginalScale;
+    renderMap();
+    renderMetricsBar();
+  }
+  radiusEditor.classList.remove("visible");
+  radiusEditorId = null;
+}
+
+/* ------------ On-map metrics bar ------------ */
+function renderMetricsBar() {
+  const bar = document.getElementById("mapMetricsBar");
+  if (state.selectionOrder.length === 0) {
+    bar.classList.add("hidden");
+    return;
+  }
+
+  let totalAud = 0, totalFrames = 0;
+
+  const segList = document.getElementById("mapMetricsSegments");
+  segList.innerHTML = "";
+  state.selectionOrder.forEach(id => {
+    const pois = segmentPOIs[id] || [];
+    const scale = segmentRadiusScale[id] || 1.0;
+    pois.forEach(([,,r,i]) => {
+      const er = r * scale;
+      totalAud += Math.round(er * i * 1.4);
+      totalFrames += Math.round(er * i * 0.6);
+    });
+    const color = colorForSegment(id);
+    const label = findLabelById(id);
+    let segAud = 0, segFrames = 0;
+    pois.forEach(([,,r,i]) => {
+      const er = r * scale;
+      segAud += Math.round(er * i * 1.4);
+      segFrames += Math.round(er * i * 0.6);
+    });
+    const segAudVal = pois.length ? (segAud / 1000).toFixed(1) + "m" : "—";
+    const segFramesVal = pois.length ? (segFrames / 1000).toFixed(1) + "k" : "—";
+    const row = document.createElement("div");
+    row.className = "map-metrics-segment-row";
+    row.innerHTML = `<span class="map-metrics-dot" style="background:${color.fill}"></span>${label}<span class="map-metrics-segment-vals"><span class="map-metrics-segment-val"><strong>${segAudVal}</strong> AUD</span><span class="map-metrics-segment-val"><strong>${segFramesVal}</strong> FR</span></span>`;
+    segList.appendChild(row);
+  });
+
+  document.getElementById("metricAudience").textContent = (totalAud / 1000).toFixed(1) + "m";
+  document.getElementById("metricFrames").textContent = (totalFrames / 1000).toFixed(1) + "k";
+  bar.classList.remove("hidden");
+}
+
+/* ------------ Search filter ------------ */
+document.getElementById("segmentSearch").addEventListener("input", (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  if (q) forEachNode(segmentTree, n => { if (n.children) state.expanded.add(n.id); });
+  renderSegments();
+  if (q) {
+    document.querySelectorAll(".segment-row").forEach(row => {
+      const lbl = row.querySelector("span:last-child").textContent.toLowerCase();
+      if (!lbl.includes(q)) row.parentElement.style.display = "none";
+    });
+  }
+});
+
+function forEachNode(nodes, fn) {
+  nodes.forEach(n => { fn(n); if (n.children) forEachNode(n.children, fn); });
+}
+
+/* ------------ Drag & Drop ------------ */
+let dragGhost = null;
+let draggingId = null;
+
+function makeDraggable(row, node) {
+  row.setAttribute("draggable", "true");
+  row.addEventListener("dragstart", (e) => {
+    draggingId = node.id;
+    row.classList.add("dragging");
+    dragGhost = document.createElement("div");
+    dragGhost.className = "drag-ghost";
+    dragGhost.innerHTML = `<svg class="pin-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${node.label}`;
+    document.body.appendChild(dragGhost);
+    e.dataTransfer.setDragImage(dragGhost, 14, 14);
+    e.dataTransfer.effectAllowed = "copy";
+    e.dataTransfer.setData("text/plain", node.id);
+  });
+  row.addEventListener("dragend", () => {
+    row.classList.remove("dragging");
+    if (dragGhost) { dragGhost.remove(); dragGhost = null; }
+    draggingId = null;
+    mapPanel.classList.remove("drag-over");
+  });
+}
+
+const mapPanel = document.querySelector(".map-panel");
+
+mapPanel.addEventListener("dragover", (e) => {
+  if (!draggingId) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "copy";
+  mapPanel.classList.add("drag-over");
+  const label = findLabelById(draggingId);
+  document.getElementById("mapDropHint").textContent = `Add "${label}" to map`;
+});
+
+mapPanel.addEventListener("dragleave", (e) => {
+  if (!mapPanel.contains(e.relatedTarget)) mapPanel.classList.remove("drag-over");
+});
+
+mapPanel.addEventListener("drop", (e) => {
+  e.preventDefault();
+  mapPanel.classList.remove("drag-over");
+  const id = e.dataTransfer.getData("text/plain") || draggingId;
+  if (id && segmentPOIs[id] && !state.selected.has(id)) {
+    state.selected.add(id);
+    state.selectionOrder.push(id);
+    renderSegments();
+    renderMap();
+    renderMetricsBar();
+  }
+});
+
+/* ------------ Init ------------ */
+renderSegments();
+renderMap();
+renderMetricsBar();
+
+document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
+document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut());
+
+setTimeout(() => map.invalidateSize(), 100);
+window.addEventListener("resize", () => map.invalidateSize());
+</script>
+</body>
+</html>
