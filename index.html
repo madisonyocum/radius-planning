@@ -930,10 +930,18 @@ function openRadiusEditorById(id, left, top) {
 function openRadiusEditorCentered(id) {
   const left = tooltipEl.style.left;
   const top = tooltipEl.style.top;
-  openRadiusEditorAt(id, left, top);
+  if (left && top) {
+    openRadiusEditorAt(id, left, top, "translate(-50%, calc(-100% - 16px))");
+  } else {
+    const mapRect = document.getElementById("map").getBoundingClientRect();
+    const panelRect = radiusEditor.parentElement.getBoundingClientRect();
+    const cx = (mapRect.left - panelRect.left) + mapRect.width / 2;
+    const cy = (mapRect.top - panelRect.top) + mapRect.height / 2;
+    openRadiusEditorAt(id, cx + "px", cy + "px", "translate(-50%, -50%)");
+  }
 }
 
-function openRadiusEditorAt(id, left, top) {
+function openRadiusEditorAt(id, left, top, transform = "translate(-50%, calc(-100% - 16px))") {
   hideTooltip();
   radiusEditorId = id;
   radiusEditorOriginalScale = segmentRadiusScale[id] || 1.0;
@@ -953,7 +961,7 @@ function openRadiusEditorAt(id, left, top) {
 
   radiusEditor.style.left = left;
   radiusEditor.style.top = top;
-  radiusEditor.style.transform = "translate(-50%, calc(-100% - 16px))";
+  radiusEditor.style.transform = transform;
   radiusEditor.classList.add("visible");
 }
 
