@@ -729,20 +729,53 @@ function defaultRadiusForSegment(id) {
   return Math.round(pois.reduce((s, p) => s + p[2], 0) / pois.length);
 }
 
+function clusterPOIs(id) {
+  const pois = segmentPOIs[id] || [];
+  if (!pois.length) return [];
+  const threshold = 60;
+  const assigned = new Array(pois.length).fill(false);
+  const clusters = [];
+
+  for (let i = 0; i < pois.length; i++) {
+    if (assigned[i]) continue;
+    const group = [i];
+    assigned[i] = true;
+    const p1 = map.latLngToContainerPoint(L.latLng(pois[i][0], pois[i][1]));
+    for (let j = i + 1; j < pois.length; j++) {
+      if (assigned[j]) continue;
+      const p2 = map.latLngToContainerPoint(L.latLng(pois[j][0], pois[j][1]));
+      if (Math.hypot(p1.x - p2.x, p1.y - p2.y) < threshold) {
+        group.push(j);
+        assigned[j] = true;
+      }
+    }
+    clusters.push(group);
+  }
+
+  return clusters.map(indices => {
+    const pts = indices.map(i => pois[i]);
+    const lat = pts.reduce((s, p) => s + p[0], 0) / pts.length;
+    const lng = pts.reduce((s, p) => s + p[1], 0) / pts.length;
+    const maxR = Math.max(...pts.map(p => p[2]));
+    const radius = maxR * (1 + 0.35 * Math.log(pts.length + 1));
+    const intensity = pts.reduce((s, p) => s + p[3], 0) / pts.length;
+    return { lat, lng, radius, intensity, count: pts.length };
+  });
+}
+
 function renderMap() {
   circleLayer.clearLayers();
   state.selectionOrder.forEach(id => {
-    const pois = segmentPOIs[id];
-    if (!pois) return;
+    if (!segmentPOIs[id]) return;
     const { stroke, fill } = colorForSegment(id);
-    pois.forEach(([lat, lng, radius, intensity]) => {
-      const r = effectiveRadius(id, radius);
-      const circle = L.circle([lat, lng], {
+    clusterPOIs(id).forEach(cluster => {
+      const r = effectiveRadius(id, cluster.radius);
+      const circle = L.circle([cluster.lat, cluster.lng], {
         radius: r,
         color: stroke,
         weight: 2,
         fillColor: fill,
-        fillOpacity: 0.10 + intensity * 0.18,
+        fillOpacity: 0.10 + cluster.intensity * 0.18,
       });
       circle.on("click", (ev) => { L.DomEvent.stopPropagation(ev); showTooltip(ev, id); });
       circle.addTo(circleLayer);
@@ -828,6 +861,7 @@ function hideTooltip() {
 }
 
 map.on("click", hideTooltip);
+map.on("zoomend", renderMap);
 
 /* ------------ Radius Editor ------------ */
 const radiusEditor = document.getElementById("radiusEditor");
