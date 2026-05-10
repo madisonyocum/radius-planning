@@ -143,6 +143,20 @@
   .filter-apply { flex: 1; padding: 9px 0; border-radius: 8px; border: none; background: #2b6cdf; font-size: 13.5px; font-weight: 500; color: #fff; cursor: pointer; }
   .filter-apply:hover { background: #2057bd; }
 
+  /* POI popup */
+  .leaflet-popup-content-wrapper.poi-popup-wrap { border-radius: 12px; box-shadow: 0 6px 28px rgba(0,0,0,0.14); padding: 0; border: none; }
+  .leaflet-popup-content-wrapper.poi-popup-wrap .leaflet-popup-content { margin: 0; }
+  .leaflet-popup-tip-container { display: none; }
+  .poi-popup { min-width: 200px; }
+  .poi-popup-header { display: flex; align-items: center; gap: 9px; padding: 14px 16px 10px; border-bottom: 1px solid #f0f3f8; }
+  .poi-popup-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .poi-popup-name { font-size: 13.5px; font-weight: 600; color: #1a2233; }
+  .poi-popup-metrics { display: flex; gap: 0; }
+  .poi-popup-metric { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 11px 10px; border-right: 1px solid #f0f3f8; }
+  .poi-popup-metric:last-child { border-right: none; }
+  .poi-popup-val { font-size: 15px; font-weight: 700; color: #1a2233; }
+  .poi-popup-key { font-size: 10.5px; color: #8a94a8; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
 </style>
 </head>
 <body>
@@ -437,16 +451,52 @@ function clusterPOIs(id) {
   });
 }
 
+function segmentMetrics(id) {
+  const pois = segmentPOIs[id] || [];
+  const scale = segmentRadiusScale[id] || 1.0;
+  let aud = 0, fr = 0;
+  pois.forEach(([,,r,i]) => { const er = r * scale; aud += Math.round(er * i * 1.4); fr += Math.round(er * i * 0.6); });
+  return { aud, fr };
+}
+
 function renderMap() {
   circleLayer.clearLayers();
-  segments.forEach(({ id }, idx) => {
-    const { stroke, fill } = colorPalette[idx];
+  segments.forEach(({ id, label }, idx) => {
+    const { stroke, fill } = colorPalette[idx % colorPalette.length];
+    const { aud, fr } = segmentMetrics(id);
     clusterPOIs(id).forEach(cluster => {
       const r = effectiveRadius(id, cluster.radius);
-      L.circle([cluster.lat, cluster.lng], {
+      const circle = L.circle([cluster.lat, cluster.lng], {
         radius: r, color: stroke, weight: 2, fillColor: fill,
         fillOpacity: 0.10 + cluster.intensity * 0.18,
-      }).addTo(circleLayer);
+        bubblingMouseEvents: false,
+      });
+      circle.on('click', () => {
+        L.popup({ className: 'poi-popup-wrap', maxWidth: 280, closeButton: true, offset: [0, -4] })
+          .setLatLng([cluster.lat, cluster.lng])
+          .setContent(`<div class="poi-popup">
+            <div class="poi-popup-header">
+              <span class="poi-popup-dot" style="background:${fill}"></span>
+              <span class="poi-popup-name">${label}</span>
+            </div>
+            <div class="poi-popup-metrics">
+              <div class="poi-popup-metric">
+                <span class="poi-popup-val">${(aud/1000000).toFixed(1)}m</span>
+                <span class="poi-popup-key">Audience</span>
+              </div>
+              <div class="poi-popup-metric">
+                <span class="poi-popup-val">${(fr/1000).toFixed(1)}k</span>
+                <span class="poi-popup-key">Frames</span>
+              </div>
+              <div class="poi-popup-metric">
+                <span class="poi-popup-val">${r}m</span>
+                <span class="poi-popup-key">Radius</span>
+              </div>
+            </div>
+          </div>`)
+          .openOn(map);
+      });
+      circle.addTo(circleLayer);
     });
   });
 }
