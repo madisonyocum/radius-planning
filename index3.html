@@ -574,7 +574,7 @@ function _postcodeStyle(feature, pts) {
   const cLat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
   const cLng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
 
-  const zip = feature.properties.GEOID20 || feature.properties.zip || feature.properties.zip_code || feature.properties.ZIP || '94000';
+  const zip = feature.properties.ZCTA5CE10 || feature.properties.GEOID20 || feature.properties.zip || '94000';
   let seed = 0;
   for (let i = 0; i < zip.length; i++) seed = (seed * 31 + zip.charCodeAt(i)) & 0xffffffff;
   let t = ((Math.abs(seed) % 1000) / 1000) * 0.45 + 0.15;
@@ -605,11 +605,7 @@ function renderPostcodes() {
 
   if (_sfZipCache) { draw(_sfZipCache); return; }
 
-  // US Census TIGERweb ZCTA boundaries — reliable public API with CORS
-  const bbox = '-122.52,37.70,-122.35,37.84';
-  const url = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/ZCTA_2020/MapServer/0/query?geometry=${encodeURIComponent(bbox)}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=GEOID20&returnGeometry=true&outSR=4326&f=geojson`;
-
-  fetch(url)
+  fetch('./sf_zips.geojson')
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(geojson => { _sfZipCache = geojson; draw(geojson); })
     .catch(() => {
