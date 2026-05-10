@@ -482,7 +482,6 @@ function renderMetrics() {
   card.classList.add("visible");
 }
 
-map.on("zoomend", renderMap);
 document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
 document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut());
 
@@ -573,11 +572,36 @@ function isOnLand(lat, lng) {
   return true;
 }
 
+// SF postcode centroids — fixed regions with deterministic base intensities
+const _postcodeCentroids = (() => {
+  const defs = [
+    [37.8075, -122.4125, 0.22], // Fishermans Wharf
+    [37.7990, -122.4060, 0.55], // North Beach / Telegraph Hill
+    [37.7960, -122.4320, 0.38], // Russian Hill
+    [37.7920, -122.3975, 0.72], // Embarcadero / FiDi east
+    [37.7855, -122.4085, 0.88], // Downtown / Union Sq
+    [37.7900, -122.4240, 0.45], // Nob Hill / Tenderloin
+    [37.7815, -122.4315, 0.31], // Hayes Valley
+    [37.7760, -122.4180, 0.67], // Mission / SOMA north
+    [37.7700, -122.4080, 0.51], // Mission / 16th
+    [37.7640, -122.4190, 0.43], // Noe Valley / Castro
+    [37.7720, -122.3980, 0.36], // Potrero Hill
+    [37.7830, -122.4490, 0.29], // Inner Sunset / Panhandle
+    [37.7760, -122.4420, 0.60], // Duboce / Castro
+    [37.8020, -122.4390, 0.24], // Pacific Heights
+    [37.7870, -122.4470, 0.18], // Western Addition / NOPA
+    [37.7650, -122.4450, 0.39], // Glen Park
+    [37.7810, -122.4680, 0.14], // Haight / Inner Richmond
+    [37.7730, -122.4620, 0.21], // Forest Hill / West Portal
+  ];
+  return defs.map(([lat, lng, base]) => ({ lat, lng, base }));
+})();
+
 function renderPostcodes() {
   clearCluster();
   circleLayer.clearLayers();
 
-  const h = 0.014, w = 0.017;
+  const h = 0.009, w = 0.011;
   const minLat = 37.706, maxLat = 37.834;
   const minLng = -122.514, maxLng = -122.355;
   const pts = getAllPOIPoints();
@@ -587,26 +611,33 @@ function renderPostcodes() {
       const cLat = lat + h / 2, cLng = lng + w / 2;
       if (!isOnLand(cLat, cLng)) continue;
 
-      let t = 0;
+      // Voronoi: find nearest postcode centroid
+      let minDist = Infinity, nearest = null;
+      _postcodeCentroids.forEach(c => {
+        const d = Math.hypot((cLat - c.lat) * 111, (cLng - c.lng) * 85);
+        if (d < minDist) { minDist = d; nearest = c; }
+      });
+
+      let t = nearest.base;
+
+      // Blend with POI proximity influence
       if (pts.length > 0) {
+        let poiScore = 0;
         pts.forEach(({ lat: pLat, lng: pLng, radius, intensity }) => {
           const distM = Math.hypot((cLat - pLat) * 111000, (cLng - pLng) * 85000);
-          const influence = radius * 2.5;
-          if (distM < influence) t += intensity * (1 - distM / influence);
+          const influence = radius * 3;
+          if (distM < influence) poiScore += intensity * (1 - distM / influence);
         });
-        t = Math.min(1, t);
-      } else {
-        const s = Math.sin(lat * 127.1 + lng * 311.7) * 43758.5453;
-        t = Math.abs(s - Math.floor(s));
+        t = Math.min(1, t * 0.45 + Math.min(1, poiScore) * 0.55);
       }
 
-      const lightness = Math.round(92 - t * 57);
-      const sat = Math.round(60 + t * 20);
+      const lightness = Math.round(91 - t * 56);
+      const sat = Math.round(52 + t * 28);
       L.rectangle([[lat, lng], [lat + h, lng + w]], {
-        color: '#fff',
-        weight: 1.2,
+        color: '#e8eef8',
+        weight: 0.8,
         fillColor: `hsl(218, ${sat}%, ${lightness}%)`,
-        fillOpacity: 0.78,
+        fillOpacity: 0.85,
       }).addTo(circleLayer);
     }
   }
