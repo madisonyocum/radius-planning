@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Campaign Tactics — Valentines Day '26</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; color: #1a2233; background: #fff; font-size: 14px; }
+
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* White app shell */
+  .app-inner { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; min-height: 0; }
+
+  /* Top bar */
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 8px 20px; border-bottom: 1px solid #e6ebf2; background: #fff; flex-shrink: 0; }
+  .menu-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5878; }
+  .menu-btn:hover { background: #f0f3f8; }
+  .logo-btn { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 4px 6px; border-radius: 6px; border: none; background: transparent; }
+  .logo-btn:hover { background: #f0f3f8; }
+  .logo-icon { width: 28px; height: 28px; border-radius: 50%; background: #2b6cdf; display: flex; align-items: center; justify-content: center; }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; color: #6b7a99; font-size: 13.5px; flex: 1; }
+  .breadcrumb .sep { color: #c0c8d6; }
+  .breadcrumb .crumb { padding: 3px 5px; border-radius: 4px; cursor: pointer; }
+  .breadcrumb .crumb:hover { background: #f0f3f8; color: #1a2233; }
+  .breadcrumb .crumb.active { color: #1a2233; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+  .topbar-right { display: flex; align-items: center; gap: 6px; }
+  .icon-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5878; }
+  .icon-btn:hover { background: #f0f3f8; }
+  .help-btn { display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-size: 13.5px; color: #4a5878; }
+  .help-btn:hover { background: #f0f3f8; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #2b6cdf; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; cursor: pointer; }
+
+  /* Page switcher */
+  .page-switcher { display: flex; align-items: center; gap: 2px; background: #f0f3f8; border-radius: 8px; padding: 3px; }
+  .page-switcher a { padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; color: #6b7a99; }
+  .page-switcher a.active { background: #fff; color: #1a2233; box-shadow: 0 1px 3px rgba(0,0,0,0.10); }
+
+  /* Header */
+  .header { padding: 14px 24px 12px; background: #fff; flex-shrink: 0; }
+  .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .back-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #e6ebf2; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5878; flex-shrink: 0; }
+  .back-btn:hover { background: #f0f3f8; }
+  .header-title { font-size: 21px; font-weight: 700; color: #1a2233; }
+  .draft-badge { padding: 3px 10px; border-radius: 20px; background: #f0f3f8; color: #6b7a99; font-size: 12px; font-weight: 500; }
+  .scenario-btn { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; border: 1px solid #e6ebf2; background: #fff; font-size: 13px; color: #1a2233; cursor: pointer; font-weight: 500; }
+  .scenario-btn:hover { background: #f5f7fb; }
+  .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .btn { padding: 7px 14px; border-radius: 8px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; border: 1px solid #d2d8e3; background: #fff; color: #1a2233; transition: background 0.12s; }
+  .btn:hover { background: #f5f7fb; }
+  .btn-primary { background: #2b6cdf; color: #fff; border-color: #2b6cdf; }
+  .btn-primary:hover { background: #2057bd; }
+  .header-meta { display: flex; align-items: center; gap: 18px; color: #6b7a99; font-size: 12.5px; padding-left: 40px; }
+  .meta-item { display: flex; align-items: center; gap: 5px; }
+  .meta-sep { color: #d2d8e3; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; padding: 0 24px; background: #fff; border-bottom: 1px solid #e6ebf2; flex-shrink: 0; }
+  .tab { padding: 11px 16px; cursor: pointer; color: #6b7a99; font-weight: 500; font-size: 13.5px; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+  .tab:hover { color: #1a2233; }
+  .tab.active { color: #2b6cdf; border-bottom-color: #2b6cdf; }
+
+  /* Map section */
+  .map-section { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 0; background: #f5f7fb; }
+  .map-toolbar { display: flex; align-items: center; gap: 10px; padding: 14px 24px 12px; background: #fff; flex-shrink: 0; }
+  .map-toolbar-title { font-size: 16px; font-weight: 600; color: #1a2233; flex: 1; }
+  .filter-btn { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid #d2d8e3; background: #fff; font-size: 13px; color: #4a5878; cursor: pointer; font-weight: 500; }
+  .filter-btn:hover { background: #f5f7fb; }
+  .pill-group { display: flex; align-items: center; gap: 6px; }
+  .pill { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #d2d8e3; background: #fff; font-size: 13px; color: #4a5878; cursor: pointer; font-weight: 500; transition: all 0.1s; }
+  .pill:hover { border-color: #2b6cdf; color: #2b6cdf; }
+  .pill.active { border-color: #2b6cdf; color: #2b6cdf; background: #fff; }
+
+  /* Map container */
+  .map-wrap { flex: 1; position: relative; min-height: 0; margin: 0 10px 10px; border-radius: 10px; overflow: hidden; border: 1px solid #e6ebf2; }
+  #map { width: 100%; height: 100%; }
+
+  /* Legend */
+  .map-legend { position: absolute; bottom: 14px; left: 14px; background: #fff; padding: 8px 12px 7px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); z-index: 500; }
+  .legend-bar { width: 140px; height: 7px; border-radius: 4px; background: linear-gradient(to right, #dce8ff, #6b9ef0, #1a3fa8); margin-bottom: 5px; }
+  .legend-labels { display: flex; justify-content: space-between; font-size: 11px; color: #6b7a99; width: 140px; }
+
+  /* Metrics card */
+  .map-metrics { position: absolute; bottom: 14px; right: 14px; background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); z-index: 500; padding: 16px 20px; min-width: 280px; display: none; }
+  .map-metrics.visible { display: block; }
+  .metrics-segments { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .metrics-seg-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #1a2233; }
+  .metrics-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .metrics-vals { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .metrics-val { font-size: 12px; color: #6b7a99; }
+  .metrics-val strong { color: #1a2233; font-weight: 600; }
+  .metrics-divider { height: 1px; background: #e6ebf2; margin-bottom: 12px; }
+  .metrics-totals { display: flex; align-items: baseline; gap: 6px; font-size: 12.5px; color: #6b7a99; }
+  .metrics-total-val { font-size: 17px; font-weight: 600; color: #1a2233; }
+  .metrics-total-sep { margin: 0 16px; color: #e6ebf2; }
+
+  /* Zoom */
+  .map-zoom { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
+  .map-zoom-btn { width: 34px; height: 34px; background: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); cursor: pointer; font-size: 18px; color: #4a5878; display: flex; align-items: center; justify-content: center; font-weight: 300; transition: background 0.12s; }
+  .map-zoom-btn:hover { background: #f0f3f8; }
+
+  .leaflet-container { font-family: inherit; background: #e8edf2; }
+  .leaflet-control-attribution { font-size: 10px; }
+
+  /* Custom cluster icons */
+  .cluster-icon { border-radius: 50%; background: #2b6cdf; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: 0 2px 10px rgba(43,108,223,0.45); border: 2.5px solid rgba(255,255,255,0.8); }
+  .cluster-sm  { width: 34px; height: 34px; font-size: 12px; }
+  .cluster-md  { width: 44px; height: 44px; font-size: 13px; }
+  .cluster-lg  { width: 56px; height: 56px; font-size: 14px; }
+  .cluster-xl  { width: 68px; height: 68px; font-size: 15px; }
+  .marker-single { width: 10px; height: 10px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(43,108,223,0.5); }
+
+  /* Filter panel */
+  .filter-overlay { position: fixed; inset: 0; background: rgba(30,35,50,0.35); z-index: 800; display: none; }
+  .filter-overlay.open { display: block; }
+  .filter-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 360px; background: #fff; z-index: 801; display: flex; flex-direction: column; box-shadow: -6px 0 32px rgba(0,0,0,0.14); transform: translateX(100%); transition: transform 0.22s ease; }
+  .filter-panel.open { transform: translateX(0); }
+  .filter-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 24px 18px; border-bottom: 1px solid #e6ebf2; flex-shrink: 0; }
+  .filter-panel-title { font-size: 18px; font-weight: 700; color: #1a2233; }
+  .filter-panel-add { width: 30px; height: 30px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #4a5878; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+  .filter-panel-add:hover { background: #f0f3f8; }
+  .filter-panel-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 22px; }
+  .filter-section-label { font-size: 13px; font-weight: 600; color: #1a2233; margin-bottom: 10px; }
+  .filter-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .filter-input { padding: 8px 12px; border: 1px solid #d2d8e3; border-radius: 7px; font-size: 13px; color: #1a2233; text-align: center; width: 100%; }
+  .filter-input:focus { outline: none; border-color: #2b6cdf; }
+  .filter-input::placeholder { color: #b0b9cc; }
+  .dual-range-wrap { position: relative; height: 20px; margin-bottom: 4px; }
+  .dual-range-track { position: absolute; top: 8px; left: 0; right: 0; height: 4px; background: #e6ebf2; border-radius: 3px; }
+  .dual-range-fill { position: absolute; top: 8px; height: 4px; background: #2b6cdf; border-radius: 3px; }
+  .dual-range-wrap input[type="range"] { position: absolute; top: 0; width: 100%; pointer-events: none; -webkit-appearance: none; appearance: none; background: transparent; height: 20px; margin: 0; }
+  .dual-range-wrap input[type="range"]::-webkit-slider-thumb { pointer-events: all; -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(43,108,223,0.4); cursor: pointer; }
+  .dual-range-wrap input[type="range"]::-moz-range-thumb { pointer-events: all; width: 14px; height: 14px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; cursor: pointer; box-shadow: 0 1px 4px rgba(43,108,223,0.4); }
+  .filter-range-labels { display: flex; justify-content: space-between; font-size: 11.5px; color: #9aa3b5; margin-top: 2px; }
+  .filter-panel-footer { padding: 16px 24px; border-top: 1px solid #e6ebf2; display: flex; gap: 10px; flex-shrink: 0; }
+  .filter-cancel { flex: 1; padding: 9px 0; border-radius: 8px; border: 1px solid #d2d8e3; background: #fff; font-size: 13.5px; font-weight: 500; color: #4a5878; cursor: pointer; }
+  .filter-cancel:hover { background: #f5f7fb; }
+  .filter-apply { flex: 1; padding: 9px 0; border-radius: 8px; border: none; background: #2b6cdf; font-size: 13.5px; font-weight: 500; color: #fff; cursor: pointer; }
+  .filter-apply:hover { background: #2057bd; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- White app shell -->
+  <div class="app-inner">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <button class="menu-btn" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="logo-btn">
+        <img src="avatar-logo.png" style="width:28px;height:28px;object-fit:contain;" alt="Logo" />
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="breadcrumb">
+        <span class="crumb">Home</span><span class="sep">/</span>
+        <span class="crumb">Paws &amp; Tails Co</span><span class="sep">/</span>
+        <span class="crumb">USA</span><span class="sep">/</span>
+        <span class="crumb active">Campaign Tactics
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </div>
+      <div class="page-switcher">
+        <a href="index.html">Index 1</a>
+        <a href="index2.html">Index 2</a>
+        <a href="index3.html" class="active">Campaign Tactics</a>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        </button>
+        <button class="help-btn">
+          Help
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </button>
+        <div class="avatar">A</div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-top">
+        <button class="back-btn" aria-label="Back">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="header-title">Valentines Day '26 — Line Item 1</span>
+        <span class="draft-badge">Draft</span>
+        <button class="scenario-btn">
+          Default Scenario
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="header-actions">
+          <!-- More -->
+          <button class="icon-btn" style="width:30px;height:30px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#4a5878"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+          </button>
+          <!-- Refresh -->
+          <button class="icon-btn" style="width:30px;height:30px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2b6cdf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+          </button>
+          <!-- Edit -->
+          <button class="btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+            Edit
+          </button>
+          <!-- Lock -->
+          <button class="btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Lock
+          </button>
+          <!-- Activate -->
+          <button class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Activate
+          </button>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Paws &amp; Tails Co — Paws &amp; Tails Dog Snacks
+        </span>
+        <span class="meta-sep">|</span>
+        <span class="meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          21/11/2025 – 28/11/2025
+        </span>
+        <span class="meta-sep">|</span>
+        <span class="meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Mon–Sun: 12am–11pm
+        </span>
+        <span class="meta-sep">|</span>
+        <span class="meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          $4,320,449.52
+        </span>
+        <span class="meta-sep">|</span>
+        <span class="meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Attentive Reach
+        </span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active">Map</div>
+      <div class="tab">Overview</div>
+      <div class="tab">Audience</div>
+      <div class="tab">Inventory</div>
+      <div class="tab">Scenario</div>
+      <div class="tab">Summary</div>
+      <div class="tab">Data Admin</div>
+    </div>
+
+    <!-- Map section -->
+    <div class="map-section">
+      <div class="map-toolbar">
+        <span class="map-toolbar-title">Map Overview</span>
+        <button class="filter-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          Filters
+        </button>
+        <div class="pill-group">
+          <button class="pill active">POIs</button>
+          <button class="pill">Frames</button>
+          <button class="pill">Heatmaps</button>
+          <button class="pill">Postcodes</button>
+        </div>
+      </div>
+
+      <div class="map-wrap">
+        <div id="map"></div>
+
+        <!-- Legend -->
+        <div class="map-legend">
+          <div class="legend-bar"></div>
+          <div class="legend-labels"><span>0</span><span>50%</span><span>100%</span></div>
+        </div>
+
+        <!-- Metrics card -->
+        <div class="map-metrics" id="mapMetrics"></div>
+
+        <!-- Zoom -->
+        <div class="map-zoom">
+          <button class="map-zoom-btn" id="zoomIn">+</button>
+          <button class="map-zoom-btn" id="zoomOut">−</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-inner -->
+</div><!-- /app -->
+
+<!-- Filter overlay + panel -->
+<div class="filter-overlay" id="filterOverlay"></div>
+<div class="filter-panel" id="filterPanel">
+  <div class="filter-panel-header">
+    <span class="filter-panel-title">Filter Publishers</span>
+    <button class="filter-panel-add">+</button>
+  </div>
+  <div class="filter-panel-body" id="filterBody"></div>
+  <div class="filter-panel-footer">
+    <button class="filter-cancel" id="filterCancel">Cancel</button>
+    <button class="filter-apply">Apply</button>
+  </div>
+</div>
+
+<script>
+const segmentPOIs = {
+  chick_fil_a: [[37.7990,-122.4115,220,0.9],[37.7965,-122.4070,200,0.7],[37.7935,-122.4040,240,0.85],[37.7820,-122.4310,230,0.6],[37.7820,-122.4145,220,0.5],[37.7895,-122.4035,210,0.75],[37.7790,-122.3995,250,0.8],[37.7755,-122.3955,230,0.7],[37.7715,-122.4105,240,0.65]],
+  wendys: [[37.7855,-122.4215,180,0.7],[37.7920,-122.4130,170,0.6],[37.7780,-122.4030,200,0.55],[37.7700,-122.4080,190,0.75]],
+  mcdonalds_drive_thru: [[37.7975,-122.4135,160,0.7],[37.7945,-122.4055,170,0.6],[37.7800,-122.4275,180,0.55],[37.7820,-122.4175,170,0.7],[37.7740,-122.4070,180,0.6]],
+  mcdonalds_walk_in: [[37.7900,-122.4185,150,0.65],[37.7860,-122.4090,160,0.7],[37.7755,-122.4185,170,0.55],[37.7770,-122.3990,180,0.6],[37.7895,-122.3955,160,0.5]],
+  burger_king: [[37.7870,-122.4160,175,0.65],[37.7830,-122.4080,165,0.6],[37.7750,-122.4120,180,0.7]],
+  taco_bell: [[37.7910,-122.4095,160,0.6],[37.7780,-122.4200,170,0.55],[37.7720,-122.4050,165,0.65]],
+  starbucks: [[37.7950,-122.4090,130,0.8],[37.7920,-122.4050,125,0.75],[37.7870,-122.4180,135,0.7],[37.7810,-122.4110,130,0.65],[37.7780,-122.4250,125,0.7],[37.7730,-122.4090,130,0.6]],
+  peets: [[37.7900,-122.4130,130,0.7],[37.7840,-122.4070,125,0.65],[37.7760,-122.4160,130,0.6]],
+  blue_bottle: [[37.7890,-122.4060,120,0.75],[37.7820,-122.4120,115,0.7]],
+  shops_electronics_apple: [[37.7910,-122.4030,210,0.9],[37.7780,-122.4080,205,0.85]],
+  shops_pharmacy_cvs: [[37.7940,-122.4100,160,0.7],[37.7880,-122.4160,155,0.65],[37.7800,-122.4070,160,0.6],[37.7740,-122.4200,155,0.65]],
+  train_bart_powell: [[37.7844,-122.4080,260,0.9]],
+  train_bart_montgomery: [[37.7890,-122.4015,255,0.85]],
+  train_bart_civic: [[37.7796,-122.4148,250,0.8]],
+  train_bart_embarcadero: [[37.7929,-122.3963,260,0.85]],
+  airports_sfo: [[37.6213,-122.3790,600,0.9]],
+  airports_oak: [[37.7213,-122.2208,580,0.85]],
+  bus_stops_route_1: [[37.7935,-122.4180,100,0.5],[37.7895,-122.4115,95,0.55],[37.7855,-122.4055,100,0.5]],
+  bus_stops_route_5: [[37.7920,-122.4160,100,0.5],[37.7880,-122.4100,95,0.55],[37.7840,-122.4040,100,0.5]],
+  grocery_wholefoods: [[37.7920,-122.4090,210,0.8],[37.7780,-122.4380,205,0.75]],
+  grocery_traderjoes: [[37.7890,-122.4070,200,0.75],[37.7760,-122.4300,195,0.7]],
+  olive_garden: [[37.7860,-122.4230,190,0.7],[37.7790,-122.4060,200,0.65]],
+  pizza_hut: [[37.7870,-122.4090,160,0.65],[37.7790,-122.4220,155,0.6]],
+};
+
+const segmentLabels = {
+  chick_fil_a:"Chick Fil A", wendys:"Wendys", mcdonalds_drive_thru:"McDonalds Drive Thru",
+  mcdonalds_walk_in:"McDonalds Walk In", burger_king:"Burger King", taco_bell:"Taco Bell",
+  starbucks:"Starbucks", peets:"Peet's Coffee", blue_bottle:"Blue Bottle Coffee",
+  shops_electronics_apple:"Apple Store", shops_pharmacy_cvs:"CVS",
+  train_bart_powell:"Powell St Station", train_bart_montgomery:"Montgomery St Station",
+  train_bart_civic:"Civic Center Station", train_bart_embarcadero:"Embarcadero Station",
+  airports_sfo:"SFO — San Francisco Intl", airports_oak:"OAK — Oakland Intl",
+  bus_stops_route_1:"Route 1 — Market St", bus_stops_route_5:"Route 5 — Fulton St",
+  grocery_wholefoods:"Whole Foods", grocery_traderjoes:"Trader Joe's",
+  olive_garden:"Olive Garden", pizza_hut:"Pizza Hut",
+};
+
+const colorPalette = [
+  { stroke: "#2b6cdf", fill: "#2b6cdf" },
+  { stroke: "#21a366", fill: "#21a366" },
+  { stroke: "#e26a2c", fill: "#e26a2c" },
+  { stroke: "#9c4dcc", fill: "#9c4dcc" },
+  { stroke: "#d83a52", fill: "#d83a52" },
+];
+
+// Read selections from localStorage (shared with index1 & index2)
+const savedOrder = JSON.parse(localStorage.getItem("rb_selectionOrder") || "[]");
+const segments = savedOrder
+  .filter(id => segmentPOIs[id])
+  .map(id => ({ id, label: segmentLabels[id] || id }));
+
+const segmentRadiusScale = {};
+
+function defaultRadiusForSegment(id) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffffffff;
+  const t = (Math.abs(hash) % 1000) / 1000;
+  return Math.round(120 + t * 260);
+}
+
+function effectiveRadius(id, baseRadius) {
+  return Math.round(baseRadius * (segmentRadiusScale[id] || 1.0));
+}
+
+function getAllPOIPoints() {
+  const pts = [];
+  segments.forEach(({ id }, segIdx) => {
+    (segmentPOIs[id] || []).forEach(([lat, lng, radius, intensity]) => {
+      pts.push({ lat, lng, radius: effectiveRadius(id, radius), intensity, segIdx });
+    });
+  });
+  return pts;
+}
+
+const map = L.map("map", {
+  center: [37.7855, -122.4140],
+  zoom: 13,
+  zoomControl: false,
+  attributionControl: false,
+});
+L.control.attribution({ position: "bottomright", prefix: false }).addTo(map);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>',
+  maxZoom: 19,
+}).addTo(map);
+
+const circleLayer = L.layerGroup().addTo(map);
+
+function clusterPOIs(id) {
+  const pois = segmentPOIs[id] || [];
+  if (!pois.length) return [];
+  const threshold = 60;
+  const assigned = new Array(pois.length).fill(false);
+  const clusters = [];
+  for (let i = 0; i < pois.length; i++) {
+    if (assigned[i]) continue;
+    const group = [i];
+    assigned[i] = true;
+    const p1 = map.latLngToContainerPoint(L.latLng(pois[i][0], pois[i][1]));
+    for (let j = i + 1; j < pois.length; j++) {
+      if (assigned[j]) continue;
+      const p2 = map.latLngToContainerPoint(L.latLng(pois[j][0], pois[j][1]));
+      if (Math.hypot(p1.x - p2.x, p1.y - p2.y) < threshold) { group.push(j); assigned[j] = true; }
+    }
+    clusters.push(group);
+  }
+  return clusters.map(indices => {
+    const pts = indices.map(i => pois[i]);
+    return {
+      lat: pts.reduce((s, p) => s + p[0], 0) / pts.length,
+      lng: pts.reduce((s, p) => s + p[1], 0) / pts.length,
+      radius: defaultRadiusForSegment(id),
+      intensity: pts.reduce((s, p) => s + p[3], 0) / pts.length,
+    };
+  });
+}
+
+function renderMap() {
+  circleLayer.clearLayers();
+  segments.forEach(({ id }, idx) => {
+    const { stroke, fill } = colorPalette[idx];
+    clusterPOIs(id).forEach(cluster => {
+      const r = effectiveRadius(id, cluster.radius);
+      L.circle([cluster.lat, cluster.lng], {
+        radius: r, color: stroke, weight: 2, fillColor: fill,
+        fillOpacity: 0.10 + cluster.intensity * 0.18,
+      }).addTo(circleLayer);
+    });
+  });
+}
+
+function renderMetrics() {
+  const card = document.getElementById("mapMetrics");
+  let totalAud = 0, totalFrames = 0;
+
+  const rows = segments.map(({ id, label }, idx) => {
+    const pois = segmentPOIs[id] || [];
+    const scale = segmentRadiusScale[id] || 1.0;
+    let aud = 0, fr = 0;
+    pois.forEach(([,,r,i]) => { const er = r * scale; aud += Math.round(er * i * 1.4); fr += Math.round(er * i * 0.6); });
+    totalAud += aud; totalFrames += fr;
+    const color = colorPalette[idx].fill;
+    return `<div class="metrics-seg-row">
+      <span class="metrics-dot" style="background:${color}"></span>
+      ${label}
+      <span class="metrics-vals">
+        <span class="metrics-val"><strong>${(aud/1000).toFixed(1)}m</strong> AUD</span>
+        <span class="metrics-val"><strong>${(fr/1000).toFixed(1)}k</strong> FR</span>
+      </span>
+    </div>`;
+  }).join("");
+
+  card.innerHTML = `
+    <div class="metrics-segments">${rows}</div>
+    <div class="metrics-divider"></div>
+    <div class="metrics-totals">
+      Audience Size <span class="metrics-total-val">${(totalAud/1000).toFixed(1)}m</span>
+      <span class="metrics-total-sep">|</span>
+      Approx. Frames <span class="metrics-total-val">${(totalFrames/1000).toFixed(1)}k</span>
+    </div>`;
+  card.classList.add("visible");
+}
+
+map.on("zoomend", renderMap);
+document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
+document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut());
+
+/* ------------ Heatmap ------------ */
+function renderHeatmap() {
+  clearCluster();
+  circleLayer.clearLayers();
+  const pts = getAllPOIPoints();
+  pts.forEach(({ lat, lng, radius, intensity }) => {
+    L.circle([lat, lng], {
+      radius: radius * 1.7,
+      color: "none", weight: 0,
+      fillColor: "#3a6fdf",
+      fillOpacity: 0.12 + intensity * 0.10,
+    }).addTo(circleLayer);
+    L.circle([lat, lng], {
+      radius: radius,
+      color: "none", weight: 0,
+      fillColor: "#d93030",
+      fillOpacity: 0.50 + intensity * 0.32,
+    }).addTo(circleLayer);
+  });
+}
+
+/* ------------ Frames cluster ------------ */
+function seededRand(seed) {
+  let s = seed;
+  return () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+}
+
+function generateFrames(lat, lng, count, radiusDeg, seedBase) {
+  const rand = seededRand(seedBase);
+  const pts = [];
+  for (let i = 0; i < count; i++) {
+    const r = radiusDeg * Math.sqrt(rand());
+    const θ = rand() * 2 * Math.PI;
+    pts.push([lat + r * Math.sin(θ), lng + r * Math.cos(θ)]);
+  }
+  return pts;
+}
+
+let clusterGroup = null;
+
+function renderFrames() {
+  if (clusterGroup) { map.removeLayer(clusterGroup); clusterGroup = null; }
+  circleLayer.clearLayers();
+
+  clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 60,
+    spiderfyOnMaxZoom: false,
+    showCoverageOnHover: false,
+    iconCreateFunction(cluster) {
+      const n = cluster.getChildCount();
+      let cls = "cluster-sm", size = 34;
+      if (n > 20)  { cls = "cluster-md"; size = 44; }
+      if (n > 80)  { cls = "cluster-lg"; size = 56; }
+      if (n > 150) { cls = "cluster-xl"; size = 68; }
+      return L.divIcon({
+        html: `<div class="cluster-icon ${cls}">${n}</div>`,
+        className: "",
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+      });
+    },
+  });
+
+  const pts = getAllPOIPoints();
+  pts.forEach(({ lat, lng, radius, intensity }, i) => {
+    const count = Math.round(8 + intensity * 28);
+    const radiusDeg = radius / 111000;
+    generateFrames(lat, lng, count, radiusDeg, 1000 + i).forEach(([fLat, fLng]) => {
+      clusterGroup.addLayer(L.marker([fLat, fLng], {
+        icon: L.divIcon({ html: '<div class="marker-single"></div>', className: "", iconSize: [10, 10], iconAnchor: [5, 5] }),
+      }));
+    });
+  });
+
+  map.addLayer(clusterGroup);
+}
+
+/* ------------ Postcodes choropleth ------------ */
+function isOnLand(lat, lng) {
+  if (lng < -122.510) return false;
+  if (lng > -122.370 && lat < 37.800) return false;
+  if (lng > -122.385 && lat < 37.760) return false;
+  if (lat < 37.708) return false;
+  if (lat > 37.832) return false;
+  return true;
+}
+
+function renderPostcodes() {
+  clearCluster();
+  circleLayer.clearLayers();
+
+  const h = 0.014, w = 0.017;
+  const minLat = 37.706, maxLat = 37.834;
+  const minLng = -122.514, maxLng = -122.355;
+  const pts = getAllPOIPoints();
+
+  for (let lat = minLat; lat < maxLat; lat += h) {
+    for (let lng = minLng; lng < maxLng; lng += w) {
+      const cLat = lat + h / 2, cLng = lng + w / 2;
+      if (!isOnLand(cLat, cLng)) continue;
+
+      let t = 0;
+      if (pts.length > 0) {
+        pts.forEach(({ lat: pLat, lng: pLng, radius, intensity }) => {
+          const distM = Math.hypot((cLat - pLat) * 111000, (cLng - pLng) * 85000);
+          const influence = radius * 2.5;
+          if (distM < influence) t += intensity * (1 - distM / influence);
+        });
+        t = Math.min(1, t);
+      } else {
+        const s = Math.sin(lat * 127.1 + lng * 311.7) * 43758.5453;
+        t = Math.abs(s - Math.floor(s));
+      }
+
+      const lightness = Math.round(92 - t * 57);
+      const sat = Math.round(60 + t * 20);
+      L.rectangle([[lat, lng], [lat + h, lng + w]], {
+        color: '#fff',
+        weight: 1.2,
+        fillColor: `hsl(218, ${sat}%, ${lightness}%)`,
+        fillOpacity: 0.78,
+      }).addTo(circleLayer);
+    }
+  }
+}
+
+let activeMode = "pois";
+
+function clearCluster() {
+  if (clusterGroup) { map.removeLayer(clusterGroup); clusterGroup = null; }
+}
+
+// Pill toggle
+document.querySelectorAll(".pill").forEach(p => {
+  p.addEventListener("click", () => {
+    document.querySelectorAll(".pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    const label = p.textContent.trim();
+    const metrics = document.getElementById("mapMetrics");
+    if (label === "Heatmaps") {
+      activeMode = "heatmap";
+      renderHeatmap();
+      metrics.classList.remove("visible");
+    } else if (label === "Frames") {
+      activeMode = "frames";
+      circleLayer.clearLayers();
+      renderFrames();
+      metrics.classList.remove("visible");
+    } else if (label === "Postcodes") {
+      activeMode = "postcodes";
+      clearCluster();
+      renderPostcodes();
+      metrics.classList.remove("visible");
+    } else {
+      activeMode = "pois";
+      clearCluster();
+      renderMap();
+      if (segments.length) renderMetrics(); else metrics.classList.remove("visible");
+    }
+  });
+});
+
+map.on("zoomend", () => { if (activeMode === "pois") renderMap(); });
+
+setTimeout(() => { map.invalidateSize(); renderMap(); renderMetrics(); }, 100);
+window.addEventListener("resize", () => map.invalidateSize());
+
+/* ------------ Filter panel ------------ */
+const filterSections = [
+  { label: "Effective CPM",  min: "4",  max: "14", rangeMin: 4,  rangeMax: 14  },
+  { label: "Impacts",        min: "",   max: "",    rangeMin: 2,  rangeMax: 16  },
+  { label: "Concentration",  min: "",   max: "",    rangeMin: 3,  rangeMax: 13  },
+  { label: "CPCV",           min: "",   max: "",    rangeMin: 1,  rangeMax: 15  },
+  { label: "CPC",            min: "",   max: "",    rangeMin: 5,  rangeMax: 17  },
+  { label: "CTR",            min: "",   max: "",    rangeMin: 2,  rangeMax: 14  },
+  { label: "Viewability",    min: "",   max: "",    rangeMin: 3,  rangeMax: 18  },
+];
+
+function buildFilterBody() {
+  const body = document.getElementById("filterBody");
+  body.innerHTML = filterSections.map((s, i) => `
+    <div>
+      <div class="filter-section-label">${s.label}</div>
+      <div class="filter-inputs">
+        <input class="filter-input" type="number" placeholder="Enter Min" value="${s.min}" data-idx="${i}" data-role="min" />
+        <input class="filter-input" type="number" placeholder="Enter Max" value="${s.max}" data-idx="${i}" data-role="max" />
+      </div>
+      <div class="dual-range-wrap" id="wrap-${i}">
+        <div class="dual-range-track"></div>
+        <div class="dual-range-fill" id="fill-${i}"></div>
+        <input type="range" min="0" max="20" value="${s.rangeMin}" class="range-min" data-idx="${i}" />
+        <input type="range" min="0" max="20" value="${s.rangeMax}" class="range-max" data-idx="${i}" />
+      </div>
+      <div class="filter-range-labels"><span>£0</span><span>£20</span></div>
+    </div>
+  `).join("");
+
+  // Update fills and sync inputs
+  filterSections.forEach((_, i) => updateFill(i));
+  body.querySelectorAll("input[type='range']").forEach(input => {
+    input.addEventListener("input", () => updateFill(parseInt(input.dataset.idx)));
+  });
+}
+
+function updateFill(i) {
+  const wrap = document.getElementById(`wrap-${i}`);
+  if (!wrap) return;
+  const minR = wrap.querySelector(".range-min");
+  const maxR = wrap.querySelector(".range-max");
+  const fill = document.getElementById(`fill-${i}`);
+  let lo = Math.min(+minR.value, +maxR.value);
+  let hi = Math.max(+minR.value, +maxR.value);
+  const pLo = (lo / 20) * 100;
+  const pHi = (hi / 20) * 100;
+  fill.style.left  = pLo + "%";
+  fill.style.width = (pHi - pLo) + "%";
+}
+
+function openFilter() {
+  buildFilterBody();
+  document.getElementById("filterOverlay").classList.add("open");
+  document.getElementById("filterPanel").classList.add("open");
+}
+function closeFilter() {
+  document.getElementById("filterOverlay").classList.remove("open");
+  document.getElementById("filterPanel").classList.remove("open");
+}
+
+document.querySelector(".filter-btn").addEventListener("click", openFilter);
+document.getElementById("filterOverlay").addEventListener("click", closeFilter);
+document.getElementById("filterCancel").addEventListener("click", closeFilter);
+document.querySelector(".filter-apply").addEventListener("click", closeFilter);
+</script>
+</body>
+</html>
