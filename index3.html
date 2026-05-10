@@ -142,6 +142,21 @@
   .filter-cancel:hover { background: #f5f7fb; }
   .filter-apply { flex: 1; padding: 9px 0; border-radius: 8px; border: none; background: #2b6cdf; font-size: 13.5px; font-weight: 500; color: #fff; cursor: pointer; }
   .filter-apply:hover { background: #2057bd; }
+
+  /* Publishers table */
+  .publishers-section { padding: 0; background: #f5f7fb; }
+  .publishers-header { display: flex; align-items: center; gap: 10px; padding: 20px 24px 12px; }
+  .publishers-title { font-size: 15px; font-weight: 600; color: #1a2233; }
+  .publishers-count { font-size: 13px; color: #8a94a8; }
+  .publishers-table-wrap { background: #fff; border-top: 1px solid #e6ebf2; border-bottom: 1px solid #e6ebf2; overflow-x: auto; }
+  .publishers-table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+  .publishers-table thead th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #8a94a8; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e6ebf2; background: #f9fafc; }
+  .publishers-table tbody tr { border-bottom: 1px solid #f0f3f8; }
+  .publishers-table tbody tr:last-child { border-bottom: none; }
+  .publishers-table tbody tr:hover { background: #f5f8ff; }
+  .publishers-table tbody td { padding: 10px 16px; color: #1a2233; }
+  .publishers-table tbody td:first-child { font-weight: 500; }
+  .publishers-table tbody tr.filtered-out { display: none; }
 </style>
 </head>
 <body>
@@ -296,6 +311,31 @@
           <button class="map-zoom-btn" id="zoomIn">+</button>
           <button class="map-zoom-btn" id="zoomOut">−</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Publishers table -->
+    <div class="publishers-section">
+      <div class="publishers-header">
+        <span class="publishers-title">Publishers</span>
+        <span class="publishers-count" id="publishersCount"></span>
+      </div>
+      <div class="publishers-table-wrap">
+        <table class="publishers-table">
+          <thead>
+            <tr>
+              <th>Publisher</th>
+              <th>Eff. CPM</th>
+              <th>Impacts</th>
+              <th>Concentration</th>
+              <th>CPCV</th>
+              <th>CPC</th>
+              <th>CTR</th>
+              <th>Viewability</th>
+            </tr>
+          </thead>
+          <tbody id="publishersBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -567,15 +607,13 @@ let _sfZipCache = null;
 
 function _postcodeStyle(feature, pts) {
   let coords = [];
-  if (feature.geometry.type === 'Polygon') {
-    coords = feature.geometry.coordinates[0];
-  } else if (feature.geometry.type === 'MultiPolygon') {
-    coords = feature.geometry.coordinates[0][0];
-  }
+  const g = feature.geometry;
+  if (g.type === 'Polygon') coords = g.coordinates[0];
+  else if (g.type === 'MultiPolygon') coords = g.coordinates[0][0];
   const cLat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
   const cLng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
 
-  const zip = feature.properties.zip || feature.properties.zip_code || feature.properties.ZIP || '94000';
+  const zip = feature.properties.GEOID20 || feature.properties.zip || feature.properties.zip_code || feature.properties.ZIP || '94000';
   let seed = 0;
   for (let i = 0; i < zip.length; i++) seed = (seed * 31 + zip.charCodeAt(i)) & 0xffffffff;
   let t = ((Math.abs(seed) % 1000) / 1000) * 0.45 + 0.15;
@@ -592,12 +630,7 @@ function _postcodeStyle(feature, pts) {
 
   const lightness = Math.round(91 - t * 56);
   const sat = Math.round(52 + t * 28);
-  return {
-    color: '#c8d4e8',
-    weight: 1.5,
-    fillColor: `hsl(218, ${sat}%, ${lightness}%)`,
-    fillOpacity: 0.82,
-  };
+  return { color: '#c8d4e8', weight: 1.5, fillColor: `hsl(218,${sat}%,${lightness}%)`, fillOpacity: 0.82 };
 }
 
 function renderPostcodes() {
@@ -606,30 +639,52 @@ function renderPostcodes() {
   const pts = getAllPOIPoints();
 
   function draw(geojson) {
-    L.geoJSON(geojson, {
-      style: f => _postcodeStyle(f, pts),
-    }).addTo(circleLayer);
+    L.geoJSON(geojson, { style: f => _postcodeStyle(f, pts) }).addTo(circleLayer);
   }
 
   if (_sfZipCache) { draw(_sfZipCache); return; }
 
-  fetch('https://data.sfgov.org/api/geospatial/srq6-hmpi?method=export&type=GeoJSON')
-    .then(r => r.json())
+  // US Census TIGERweb ZCTA boundaries — reliable public API with CORS
+  const bbox = '-122.52,37.70,-122.35,37.84';
+  const url = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/ZCTA_2020/MapServer/0/query?geometry=${encodeURIComponent(bbox)}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=GEOID20&returnGeometry=true&outSR=4326&f=geojson`;
+
+  fetch(url)
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(geojson => { _sfZipCache = geojson; draw(geojson); })
     .catch(() => {
-      // fallback: rough grid if fetch fails
-      const h = 0.012, w = 0.015;
-      for (let lat = 37.706; lat < 37.834; lat += h) {
-        for (let lng = -122.514; lng < -122.355; lng += w) {
-          const s = Math.sin(lat * 127.1 + lng * 311.7) * 43758.5453;
-          const t = Math.abs(s - Math.floor(s));
-          L.rectangle([[lat, lng], [lat + h, lng + w]], {
-            color: '#c8d4e8', weight: 1,
-            fillColor: `hsl(218, ${Math.round(52 + t * 28)}%, ${Math.round(91 - t * 56)}%)`,
-            fillOpacity: 0.82,
-          }).addTo(circleLayer);
-        }
-      }
+      // Fallback: voronoi-style hardcoded SF zip polygons
+      const zips = [
+        {z:"94133",c:[[-122.416,37.800],[-122.404,37.800],[-122.395,37.808],[-122.397,37.815],[-122.412,37.813],[-122.420,37.808]]},
+        {z:"94111",c:[[-122.404,37.800],[-122.395,37.808],[-122.388,37.806],[-122.382,37.797],[-122.388,37.790],[-122.396,37.791]]},
+        {z:"94109",c:[[-122.437,37.806],[-122.420,37.808],[-122.416,37.800],[-122.415,37.785],[-122.419,37.778],[-122.432,37.782],[-122.437,37.795]]},
+        {z:"94123",c:[[-122.453,37.808],[-122.437,37.806],[-122.437,37.795],[-122.432,37.782],[-122.445,37.781],[-122.456,37.798]]},
+        {z:"94108",c:[[-122.416,37.800],[-122.404,37.800],[-122.396,37.791],[-122.403,37.784],[-122.415,37.785]]},
+        {z:"94104",c:[[-122.403,37.784],[-122.396,37.791],[-122.388,37.790],[-122.390,37.778],[-122.400,37.778]]},
+        {z:"94102",c:[[-122.419,37.778],[-122.415,37.785],[-122.403,37.784],[-122.400,37.778],[-122.404,37.773],[-122.419,37.773]]},
+        {z:"94103",c:[[-122.419,37.773],[-122.404,37.773],[-122.400,37.778],[-122.390,37.778],[-122.383,37.764],[-122.390,37.758],[-122.404,37.759],[-122.414,37.763]]},
+        {z:"94105",c:[[-122.390,37.778],[-122.388,37.790],[-122.382,37.797],[-122.375,37.790],[-122.377,37.778],[-122.383,37.764]]},
+        {z:"94107",c:[[-122.390,37.758],[-122.383,37.764],[-122.377,37.778],[-122.375,37.750],[-122.380,37.740],[-122.378,37.722],[-122.395,37.722],[-122.397,37.750]]},
+        {z:"94110",c:[[-122.414,37.763],[-122.404,37.759],[-122.404,37.740],[-122.408,37.722],[-122.424,37.722],[-122.432,37.740],[-122.432,37.757],[-122.419,37.773]]},
+        {z:"94124",c:[[-122.395,37.722],[-122.378,37.722],[-122.376,37.740],[-122.375,37.790],[-122.369,37.788],[-122.366,37.756],[-122.370,37.726],[-122.372,37.710],[-122.395,37.710]]},
+        {z:"94134",c:[[-122.408,37.722],[-122.395,37.722],[-122.395,37.710],[-122.420,37.710],[-122.424,37.722]]},
+        {z:"94112",c:[[-122.424,37.722],[-122.420,37.710],[-122.440,37.710],[-122.452,37.722],[-122.441,37.732],[-122.432,37.740]]},
+        {z:"94114",c:[[-122.452,37.769],[-122.432,37.757],[-122.432,37.740],[-122.441,37.732],[-122.452,37.740],[-122.460,37.752]]},
+        {z:"94131",c:[[-122.460,37.752],[-122.452,37.740],[-122.441,37.732],[-122.440,37.710],[-122.452,37.710],[-122.468,37.730],[-122.463,37.752]]},
+        {z:"94127",c:[[-122.468,37.730],[-122.452,37.710],[-122.480,37.710],[-122.480,37.730]]},
+        {z:"94132",c:[[-122.480,37.730],[-122.480,37.710],[-122.511,37.710],[-122.511,37.740],[-122.494,37.742]]},
+        {z:"94116",c:[[-122.480,37.760],[-122.463,37.752],[-122.468,37.730],[-122.480,37.730],[-122.494,37.742],[-122.492,37.760]]},
+        {z:"94117",c:[[-122.460,37.779],[-122.452,37.769],[-122.460,37.752],[-122.480,37.760],[-122.480,37.770],[-122.470,37.779]]},
+        {z:"94115",c:[[-122.440,37.785],[-122.432,37.782],[-122.432,37.757],[-122.452,37.769],[-122.460,37.779],[-122.470,37.779],[-122.470,37.785]]},
+        {z:"94118",c:[[-122.480,37.800],[-122.440,37.800],[-122.440,37.785],[-122.470,37.785],[-122.480,37.785]]},
+        {z:"94121",c:[[-122.511,37.800],[-122.480,37.800],[-122.480,37.785],[-122.511,37.785]]},
+        {z:"94122",c:[[-122.511,37.785],[-122.492,37.760],[-122.480,37.760],[-122.480,37.770],[-122.470,37.779],[-122.455,37.775],[-122.460,37.760],[-122.511,37.762]]},
+      ];
+      const fb = { type:"FeatureCollection", features: zips.map(({z,c}) => ({
+        type:"Feature", properties:{GEOID20:z},
+        geometry:{type:"Polygon", coordinates:[[...c,c[0]]]}
+      }))};
+      _sfZipCache = fb;
+      draw(fb);
     });
 }
 
@@ -674,15 +729,69 @@ map.on("zoomend", () => { if (activeMode === "pois") renderMap(); });
 setTimeout(() => { map.invalidateSize(); renderMap(); renderMetrics(); }, 100);
 window.addEventListener("resize", () => map.invalidateSize());
 
+/* ------------ Publisher table data ------------ */
+const publisherData = [
+  { name:"Clear Channel SF — Market St",   cpm:12.4, impacts:14.2, conc:8.1,  cpcv:9.3,  cpc:11.5, ctr:7.2,  view:15.8 },
+  { name:"Outfront Media — Union Square",  cpm:15.1, impacts:17.6, conc:12.3, cpcv:13.8, cpc:14.7, ctr:10.4, view:18.1 },
+  { name:"Lamar — Mission District",       cpm:7.8,  impacts:9.4,  conc:5.2,  cpcv:6.1,  cpc:8.3,  ctr:4.9,  view:10.2 },
+  { name:"Intersection — Powell BART",     cpm:18.3, impacts:19.1, conc:16.4, cpcv:17.2, cpc:17.8, ctr:14.6, view:19.4 },
+  { name:"JCDecaux — Embarcadero",         cpm:14.6, impacts:16.8, conc:11.9, cpcv:12.4, cpc:13.9, ctr:9.7,  view:17.3 },
+  { name:"Vistar — SoMa Digital",          cpm:9.2,  impacts:11.5, conc:7.3,  cpcv:8.8,  cpc:10.1, ctr:6.4,  view:12.7 },
+  { name:"Clear Channel — Van Ness Corr.", cpm:6.3,  impacts:7.1,  conc:4.8,  cpcv:5.4,  cpc:6.9,  ctr:3.8,  view:8.5  },
+  { name:"Outfront — Fishermans Wharf",    cpm:11.7, impacts:13.0, conc:9.6,  cpcv:10.2, cpc:12.4, ctr:8.1,  view:14.6 },
+  { name:"Lamar — Potrero Hill Blvd",      cpm:4.9,  impacts:5.8,  conc:3.1,  cpcv:4.0,  cpc:5.5,  ctr:2.7,  view:6.9  },
+  { name:"Intersection — Civic Center",    cpm:16.8, impacts:18.4, conc:14.7, cpcv:15.9, cpc:16.3, ctr:12.2, view:18.9 },
+  { name:"JCDecaux — North Beach",         cpm:13.2, impacts:15.6, conc:10.4, cpcv:11.7, cpc:13.0, ctr:8.9,  view:16.1 },
+  { name:"Vistar — Castro Digital",        cpm:8.5,  impacts:10.2, conc:6.4,  cpcv:7.6,  cpc:9.4,  ctr:5.6,  view:11.8 },
+  { name:"Clear Channel — Richmond",       cpm:5.7,  impacts:6.5,  conc:3.9,  cpcv:4.8,  cpc:6.2,  ctr:3.1,  view:7.4  },
+  { name:"Outfront — Haight-Ashbury",      cpm:10.3, impacts:12.1, conc:8.8,  cpcv:9.5,  cpc:11.2, ctr:7.4,  view:13.5 },
+  { name:"Lamar — Bayview Network",        cpm:3.8,  impacts:4.6,  conc:2.4,  cpcv:3.2,  cpc:4.3,  ctr:1.9,  view:5.6  },
+  { name:"Intersection — Ferry Building",  cpm:19.2, impacts:19.8, conc:17.6, cpcv:18.4, cpc:18.9, ctr:15.8, view:19.9 },
+  { name:"JCDecaux — Golden Gate Park",    cpm:7.1,  impacts:8.3,  conc:5.7,  cpcv:6.9,  cpc:7.8,  ctr:4.5,  view:9.4  },
+  { name:"Vistar — Pacific Heights",       cpm:17.4, impacts:18.9, conc:15.3, cpcv:16.6, cpc:17.1, ctr:13.4, view:19.2 },
+];
+
+function renderPublishers(filters) {
+  const tbody = document.getElementById("publishersBody");
+  const count = document.getElementById("publishersCount");
+  if (!tbody) return;
+
+  const keys = ["cpm","impacts","conc","cpcv","cpc","ctr","view"];
+  let visible = 0;
+
+  tbody.innerHTML = publisherData.map(row => {
+    const vals = [row.cpm, row.impacts, row.conc, row.cpcv, row.cpc, row.ctr, row.view];
+    const filtered = filters && keys.some((k, i) => {
+      const lo = filters[i].lo, hi = filters[i].hi;
+      return vals[i] < lo || vals[i] > hi;
+    });
+    if (!filtered) visible++;
+    const cls = filtered ? ' class="filtered-out"' : '';
+    const fmt = v => v.toFixed(1);
+    return `<tr${cls}>
+      <td>${row.name}</td>
+      <td>£${fmt(row.cpm)}</td>
+      <td>${fmt(row.impacts)}</td>
+      <td>${fmt(row.conc)}</td>
+      <td>£${fmt(row.cpcv)}</td>
+      <td>£${fmt(row.cpc)}</td>
+      <td>${fmt(row.ctr)}%</td>
+      <td>${fmt(row.view)}%</td>
+    </tr>`;
+  }).join("");
+
+  count.textContent = `${visible} of ${publisherData.length} publishers`;
+}
+
 /* ------------ Filter panel ------------ */
 const filterSections = [
-  { label: "Effective CPM",  min: "4",  max: "14", rangeMin: 4,  rangeMax: 14  },
-  { label: "Impacts",        min: "",   max: "",    rangeMin: 2,  rangeMax: 16  },
-  { label: "Concentration",  min: "",   max: "",    rangeMin: 3,  rangeMax: 13  },
-  { label: "CPCV",           min: "",   max: "",    rangeMin: 1,  rangeMax: 15  },
-  { label: "CPC",            min: "",   max: "",    rangeMin: 5,  rangeMax: 17  },
-  { label: "CTR",            min: "",   max: "",    rangeMin: 2,  rangeMax: 14  },
-  { label: "Viewability",    min: "",   max: "",    rangeMin: 3,  rangeMax: 18  },
+  { label: "Effective CPM",  rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
+  { label: "Impacts",        rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
+  { label: "Concentration",  rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
+  { label: "CPCV",           rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
+  { label: "CPC",            rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
+  { label: "CTR",            rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
+  { label: "Viewability",    rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
 ];
 
 function buildFilterBody() {
@@ -691,38 +800,71 @@ function buildFilterBody() {
     <div>
       <div class="filter-section-label">${s.label}</div>
       <div class="filter-inputs">
-        <input class="filter-input" type="number" placeholder="Enter Min" value="${s.min}" data-idx="${i}" data-role="min" />
-        <input class="filter-input" type="number" placeholder="Enter Max" value="${s.max}" data-idx="${i}" data-role="max" />
+        <input class="filter-input" type="number" min="0" max="20" step="0.1" placeholder="Enter Min" value="${s.lo > 0 ? s.lo : ''}" data-idx="${i}" data-role="min" />
+        <input class="filter-input" type="number" min="0" max="20" step="0.1" placeholder="Enter Max" value="${s.hi < 20 ? s.hi : ''}" data-idx="${i}" data-role="max" />
       </div>
       <div class="dual-range-wrap" id="wrap-${i}">
         <div class="dual-range-track"></div>
         <div class="dual-range-fill" id="fill-${i}"></div>
-        <input type="range" min="0" max="20" value="${s.rangeMin}" class="range-min" data-idx="${i}" />
-        <input type="range" min="0" max="20" value="${s.rangeMax}" class="range-max" data-idx="${i}" />
+        <input type="range" min="0" max="20" step="0.1" value="${s.lo}" class="range-min" data-idx="${i}" />
+        <input type="range" min="0" max="20" step="0.1" value="${s.hi}" class="range-max" data-idx="${i}" />
       </div>
       <div class="filter-range-labels"><span>£0</span><span>£20</span></div>
     </div>
   `).join("");
 
-  // Update fills and sync inputs
   filterSections.forEach((_, i) => updateFill(i));
+
   body.querySelectorAll("input[type='range']").forEach(input => {
-    input.addEventListener("input", () => updateFill(parseInt(input.dataset.idx)));
+    input.addEventListener("input", () => {
+      const i = +input.dataset.idx;
+      const wrap = document.getElementById(`wrap-${i}`);
+      const minR = wrap.querySelector(".range-min");
+      const maxR = wrap.querySelector(".range-max");
+      const lo = Math.min(+minR.value, +maxR.value);
+      const hi = Math.max(+minR.value, +maxR.value);
+      // Sync number inputs
+      const inputs = body.querySelectorAll(`.filter-input[data-idx="${i}"]`);
+      inputs[0].value = lo > 0 ? lo : '';
+      inputs[1].value = hi < 20 ? hi : '';
+      updateFill(i);
+    });
+  });
+
+  body.querySelectorAll(".filter-input").forEach(input => {
+    input.addEventListener("input", () => {
+      const i = +input.dataset.idx;
+      const wrap = document.getElementById(`wrap-${i}`);
+      const minR = wrap.querySelector(".range-min");
+      const maxR = wrap.querySelector(".range-max");
+      const allInputs = body.querySelectorAll(`.filter-input[data-idx="${i}"]`);
+      const rawMin = parseFloat(allInputs[0].value);
+      const rawMax = parseFloat(allInputs[1].value);
+      if (!isNaN(rawMin)) minR.value = Math.max(0, Math.min(20, rawMin));
+      if (!isNaN(rawMax)) maxR.value = Math.max(0, Math.min(20, rawMax));
+      updateFill(i);
+    });
   });
 }
 
 function updateFill(i) {
   const wrap = document.getElementById(`wrap-${i}`);
   if (!wrap) return;
-  const minR = wrap.querySelector(".range-min");
-  const maxR = wrap.querySelector(".range-max");
+  const lo = Math.min(+wrap.querySelector(".range-min").value, +wrap.querySelector(".range-max").value);
+  const hi = Math.max(+wrap.querySelector(".range-min").value, +wrap.querySelector(".range-max").value);
   const fill = document.getElementById(`fill-${i}`);
-  let lo = Math.min(+minR.value, +maxR.value);
-  let hi = Math.max(+minR.value, +maxR.value);
-  const pLo = (lo / 20) * 100;
-  const pHi = (hi / 20) * 100;
-  fill.style.left  = pLo + "%";
-  fill.style.width = (pHi - pLo) + "%";
+  fill.style.left  = (lo / 20 * 100) + "%";
+  fill.style.width = ((hi - lo) / 20 * 100) + "%";
+}
+
+function getActiveFilters() {
+  return filterSections.map((_, i) => {
+    const wrap = document.getElementById(`wrap-${i}`);
+    if (!wrap) return { lo: 0, hi: 20 };
+    const lo = Math.min(+wrap.querySelector(".range-min").value, +wrap.querySelector(".range-max").value);
+    const hi = Math.max(+wrap.querySelector(".range-min").value, +wrap.querySelector(".range-max").value);
+    return { lo, hi };
+  });
 }
 
 function openFilter() {
@@ -734,11 +876,19 @@ function closeFilter() {
   document.getElementById("filterOverlay").classList.remove("open");
   document.getElementById("filterPanel").classList.remove("open");
 }
+function applyFilter() {
+  const filters = getActiveFilters();
+  filterSections.forEach((s, i) => { s.lo = filters[i].lo; s.hi = filters[i].hi; });
+  renderPublishers(filters);
+  closeFilter();
+}
 
 document.querySelector(".filter-btn").addEventListener("click", openFilter);
 document.getElementById("filterOverlay").addEventListener("click", closeFilter);
 document.getElementById("filterCancel").addEventListener("click", closeFilter);
-document.querySelector(".filter-apply").addEventListener("click", closeFilter);
+document.querySelector(".filter-apply").addEventListener("click", applyFilter);
+
+renderPublishers(null);
 </script>
 </body>
 </html>
