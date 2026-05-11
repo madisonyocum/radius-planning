@@ -143,11 +143,19 @@
   .filter-apply { flex: 1; padding: 9px 0; border-radius: 8px; border: none; background: #2b6cdf; font-size: 13.5px; font-weight: 500; color: #fff; cursor: pointer; }
   .filter-apply:hover { background: #2057bd; }
 
-  /* POI popup — matches .map-metrics card */
-  .leaflet-popup-content-wrapper.poi-popup-wrap { border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); padding: 16px 20px; border: none; min-width: 260px; }
+  /* POI popup — matches index1 stats panel style */
+  .leaflet-popup-content-wrapper.poi-popup-wrap { border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.14); padding: 0; border: none; }
   .leaflet-popup-content-wrapper.poi-popup-wrap .leaflet-popup-content { margin: 0; }
   .leaflet-popup-tip-container { display: none; }
-  .poi-popup-close { position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 15px; color: #9aa3b5; cursor: pointer; line-height: 1; padding: 0; }
+  .leaflet-popup-close-button { display: none; }
+  .poi-popup-seg { padding: 16px 20px 18px; border-bottom: 1px solid #f0f3f8; }
+  .poi-popup-seg:last-child { border-bottom: none; }
+  .poi-popup-seg-header { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; font-weight: 500; font-size: 14px; color: #1a2233; }
+  .poi-popup-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .poi-popup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .poi-popup-card { background: #f5f7fb; border-radius: 10px; padding: 9px 12px 11px; }
+  .poi-popup-card-label { font-size: 11.5px; color: #9aa3b5; margin-bottom: 3px; }
+  .poi-popup-card-val { font-size: 19px; font-weight: 500; color: #1a2233; }
 
 </style>
 </head>
@@ -464,30 +472,29 @@ function renderMap() {
         bubblingMouseEvents: false,
       });
       circle.on('click', () => {
-        let totalAud = 0, totalFr = 0;
-        const rows = segments.map(({ id: sid, label: slabel }, sidx) => {
+        const segs = segments.map(({ id: sid, label: slabel }, sidx) => {
           const { aud: sa, fr: sf } = segmentMetrics(sid);
-          totalAud += sa; totalFr += sf;
           const c = colorPalette[sidx % colorPalette.length].fill;
-          return `<div class="metrics-seg-row">
-            <span class="metrics-dot" style="background:${c}"></span>
-            ${slabel}
-            <span class="metrics-vals">
-              <span class="metrics-val"><strong>${(sa/1000).toFixed(1)}m</strong> AUD</span>
-              <span class="metrics-val"><strong>${(sf/1000).toFixed(1)}k</strong> FR</span>
-            </span>
+          return `<div class="poi-popup-seg">
+            <div class="poi-popup-seg-header">
+              <span class="poi-popup-dot" style="background:${c}"></span>
+              <span>${slabel}</span>
+            </div>
+            <div class="poi-popup-grid">
+              <div class="poi-popup-card">
+                <div class="poi-popup-card-label">Audience Size</div>
+                <div class="poi-popup-card-val">${(sa/1000).toFixed(1)}m</div>
+              </div>
+              <div class="poi-popup-card">
+                <div class="poi-popup-card-label">Approx. Frames</div>
+                <div class="poi-popup-card-val">${(sf/1000).toFixed(1)}k</div>
+              </div>
+            </div>
           </div>`;
         }).join('');
-        L.popup({ className: 'poi-popup-wrap', maxWidth: 320, closeButton: false, offset: [0, -4] })
+        L.popup({ className: 'poi-popup-wrap', maxWidth: 300, closeButton: false, offset: [0, -4] })
           .setLatLng([cluster.lat, cluster.lng])
-          .setContent(`
-            <div class="metrics-segments">${rows}</div>
-            <div class="metrics-divider"></div>
-            <div class="metrics-totals">
-              Audience Size <span class="metrics-total-val">${(totalAud/1000).toFixed(1)}m</span>
-              <span class="metrics-total-sep">|</span>
-              Approx. Frames <span class="metrics-total-val">${(totalFr/1000).toFixed(1)}k</span>
-            </div>`)
+          .setContent(segs)
           .openOn(map);
       });
       circle.addTo(circleLayer);
