@@ -649,13 +649,28 @@ function renderPostcodes() {
   circleLayer.clearLayers();
   const pts = getAllPOIPoints();
 
+  // Zip codes to exclude: off-peninsula islands and airport
+  const EXCLUDE_ZIPS = new Set(['94128','94130']);
+
   function draw(geojson) {
-    L.geoJSON(geojson, { style: f => _postcodeStyle(f, pts) }).addTo(circleLayer);
+    L.geoJSON(geojson, {
+      filter: f => {
+        const zip = f.properties.ZCTA5CE10 || f.properties.GEOID20 || '';
+        if (EXCLUDE_ZIPS.has(zip)) return false;
+        // Exclude features whose centroid is outside the SF peninsula bounding box
+        const g = f.geometry;
+        const coords = g.type === 'Polygon' ? g.coordinates[0] : g.coordinates[0][0];
+        const cLat = coords.reduce((s,c) => s + c[1], 0) / coords.length;
+        const cLng = coords.reduce((s,c) => s + c[0], 0) / coords.length;
+        return cLat > 37.700 && cLat < 37.835 && cLng > -122.520 && cLng < -122.355;
+      },
+      style: f => _postcodeStyle(f, pts),
+    }).addTo(circleLayer);
   }
 
   if (_sfZipCache) { draw(_sfZipCache); return; }
 
-  fetch('./sf_zips.geojson')
+  fetch('./sf_zips.geojson?v=2')
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(geojson => { _sfZipCache = geojson; draw(geojson); })
     .catch(() => {
