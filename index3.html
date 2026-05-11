@@ -143,6 +143,19 @@
   .filter-apply { flex: 1; padding: 9px 0; border-radius: 8px; border: none; background: #2b6cdf; font-size: 13.5px; font-weight: 500; color: #fff; cursor: pointer; }
   .filter-apply:hover { background: #2057bd; }
 
+  /* Time-of-day slider (Frames mode) */
+  .time-slider-wrap { position: absolute; bottom: 14px; right: 14px; z-index: 500; background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.10); border: 1px solid #e6ebf2; padding: 8px 14px 8px 12px; display: none; align-items: center; gap: 10px; min-width: 520px; }
+  .time-slider-wrap.visible { display: flex; }
+  .time-day-select { appearance: none; -webkit-appearance: none; padding: 5px 24px 5px 10px; border-radius: 7px; border: 1.5px solid #d2d8e3; font-size: 12px; font-weight: 500; color: #1a2233; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 8px center; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .time-slider-track-wrap { flex: 1; position: relative; }
+  .time-labels { position: relative; height: 14px; margin-bottom: 4px; pointer-events: none; user-select: none; }
+  .time-labels span { position: absolute; font-size: 10px; color: #b0b9cc; white-space: nowrap; }
+  .time-track { position: relative; height: 16px; display: flex; align-items: center; cursor: pointer; }
+  .time-track-bar { position: absolute; left: 0; right: 0; height: 3px; background: #eaecf2; border-radius: 2px; }
+  .time-track-fill { position: absolute; left: 0; height: 3px; background: #2b6cdf; border-radius: 2px; }
+  .time-thumb { position: absolute; width: 12px; height: 12px; background: #2b6cdf; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(43,108,223,0.4); transform: translateX(-50%); cursor: grab; top: 50%; margin-top: -6px; }
+  .time-current { font-size: 12px; font-weight: 700; color: #2b6cdf; white-space: nowrap; flex-shrink: 0; min-width: 36px; text-align: right; letter-spacing: -0.2px; }
+
   /* POI popup — exact index1 stats panel styles */
   /* Custom POI float popup */
   .poi-float { position: absolute; z-index: 600; background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; box-shadow: 0 6px 24px rgba(0,0,0,0.14); padding: 10px 12px 11px; pointer-events: none; transform: translate(-50%, calc(-100% - 14px)); }
@@ -310,6 +323,31 @@
 
         <!-- Custom POI popup -->
         <div id="poiPopup" class="poi-float" style="display:none"></div>
+
+        <!-- Time-of-day slider (Frames mode) -->
+        <div class="time-slider-wrap" id="timeSliderWrap">
+          <select class="time-day-select" id="timeDaySelect">
+            <option>Set day</option>
+            <option>Monday</option>
+            <option>Tuesday</option>
+            <option>Wednesday</option>
+            <option>Thursday</option>
+            <option>Friday</option>
+            <option>Saturday</option>
+            <option>Sunday</option>
+          </select>
+          <div class="time-slider-track-wrap">
+            <div class="time-labels">
+              <span>12AM</span><span>2AM</span><span>4AM</span><span>6AM</span><span>8AM</span><span>10AM</span><span>12PM</span><span>2PM</span><span>4PM</span><span>6PM</span><span>8PM</span><span>10PM</span><span>12AM</span>
+            </div>
+            <div class="time-track" id="timeTrack">
+              <div class="time-track-bar"></div>
+              <div class="time-track-fill" id="timeTrackFill"></div>
+              <div class="time-thumb" id="timeThumb"></div>
+            </div>
+          </div>
+          <div class="time-current" id="timeCurrent">9AM</div>
+        </div>
       </div>
     </div>
 
@@ -320,8 +358,7 @@
 <div class="filter-overlay" id="filterOverlay"></div>
 <div class="filter-panel" id="filterPanel">
   <div class="filter-panel-header">
-    <span class="filter-panel-title">Filter Publishers</span>
-    <button class="filter-panel-add">+</button>
+    <span class="filter-panel-title">Filters</span>
   </div>
   <div class="filter-panel-body" id="filterBody"></div>
   <div class="filter-panel-footer">
@@ -723,25 +760,30 @@ document.querySelectorAll(".pill").forEach(p => {
     p.classList.add("active");
     const label = p.textContent.trim();
     const metrics = document.getElementById("mapMetrics");
+    const timeSlider = document.getElementById("timeSliderWrap");
     if (label === "Heatmaps") {
       activeMode = "heatmap";
       renderHeatmap();
       metrics.classList.remove("visible");
+      timeSlider.classList.remove("visible");
     } else if (label === "Frames") {
       activeMode = "frames";
       circleLayer.clearLayers();
       renderFrames();
       metrics.classList.remove("visible");
+      timeSlider.classList.add("visible");
     } else if (label === "Postcodes") {
       activeMode = "postcodes";
       clearCluster();
       renderPostcodes();
       metrics.classList.remove("visible");
+      timeSlider.classList.remove("visible");
     } else {
       activeMode = "pois";
       clearCluster();
       renderMap();
       if (segments.length) renderMetrics(); else metrics.classList.remove("visible");
+      timeSlider.classList.remove("visible");
     }
   });
 });
@@ -839,6 +881,58 @@ document.querySelector(".filter-btn").addEventListener("click", openFilter);
 document.getElementById("filterOverlay").addEventListener("click", closeFilter);
 document.getElementById("filterCancel").addEventListener("click", closeFilter);
 document.querySelector(".filter-apply").addEventListener("click", closeFilter);
+
+/* ------------ Time-of-day slider ------------ */
+(function() {
+  const HOURS = 24;
+  let currentHour = 9;
+
+  const track = document.getElementById("timeTrack");
+  const thumb = document.getElementById("timeThumb");
+  const fill  = document.getElementById("timeTrackFill");
+  const label = document.getElementById("timeCurrent");
+  const labelsEl = document.querySelector(".time-labels");
+
+  // Every 4 hours: 0,4,8,...,24 → 7 labels with room to breathe
+  const tickHours = [0,4,8,12,16,20,24];
+  function hourLabel(h) {
+    if (h === 0 || h === 24) return "12AM";
+    if (h === 12) return "12PM";
+    return h < 12 ? h + "AM" : (h - 12) + "PM";
+  }
+
+  // Build absolutely-positioned labels — all via inline style so no CSS conflicts
+  labelsEl.innerHTML = tickHours.map((h, i) => {
+    const pct = (h / HOURS) * 100;
+    let style;
+    if (i === 0)                        style = 'left:0;transform:none';
+    else if (i === tickHours.length-1)  style = `left:${pct}%;transform:translateX(-100%)`;
+    else                                style = `left:${pct}%;transform:translateX(-50%)`;
+    return `<span style="${style}">${hourLabel(h)}</span>`;
+  }).join("");
+
+  function setHour(h) {
+    currentHour = Math.max(0, Math.min(HOURS, h));
+    const pct = (currentHour / HOURS) * 100;
+    thumb.style.left = pct + "%";
+    fill.style.width = pct + "%";
+    label.textContent = hourLabel(currentHour);
+  }
+
+  function posToHour(clientX) {
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return Math.round(ratio * HOURS);
+  }
+
+  let dragging = false;
+  thumb.addEventListener("mousedown", e => { dragging = true; e.preventDefault(); });
+  track.addEventListener("click", e => { if (!dragging) setHour(posToHour(e.clientX)); });
+  document.addEventListener("mousemove", e => { if (dragging) setHour(posToHour(e.clientX)); });
+  document.addEventListener("mouseup", () => { dragging = false; });
+
+  setHour(9);
+})();
 </script>
 </body>
 </html>
