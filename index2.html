@@ -78,7 +78,7 @@
   .segment-node[data-depth="0"] { border-bottom: 1px solid #e6ebf2; }
   .segment-node[data-depth="0"]:last-child { border-bottom: none; }
 
-  .segment-row { display: flex; align-items: center; gap: 8px; padding: 13px 18px; cursor: pointer; font-size: 15px; color: #1a2233; transition: color 0.1s, background 0.1s; position: relative; }
+  .segment-row { display: flex; align-items: center; gap: 8px; padding: 13px 18px; cursor: pointer; font-size: 15px; color: #1a2233; transition: color 0.1s, background 0.1s; position: relative; isolation: isolate; }
   .segment-row:not([data-depth="0"]):hover { color: #2b6cdf; background: transparent; }
   .segment-row:not([data-depth="0"]):hover::before { content: ''; position: absolute; left: 6px; right: 6px; top: 0; bottom: 0; background: #eaf1fc; border-radius: 8px; z-index: -1; }
   .segment-row:not([data-depth="0"]):hover .pin { color: #2b6cdf; }
@@ -128,6 +128,28 @@
   .map-metric-label { font-size: 12px; color: #6b7a99; white-space: nowrap; }
   .map-metric-value { font-size: 17px; font-weight: 600; color: #1a2233; }
   .map-metric-sep { width: 1px; height: 24px; background: #e6ebf2; margin: 0 14px; flex-shrink: 0; }
+
+  /* Change Radius button inside metrics bar */
+  .metrics-radius-btn { width: 100%; padding: 7px 0; border-radius: 8px; border: 1px solid #e6ebf2; background: #fff; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.12s, border-color 0.12s; }
+  .metrics-radius-btn:hover { background: #f5f7fb; border-color: #c8d0e0; color: #1a2233; }
+
+  /* All-segments radius panel */
+  .radius-all-panel { position: absolute; bottom: 14px; right: 14px; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.13); z-index: 600; padding: 18px 22px 16px; display: none; min-width: 300px; max-height: calc(100% - 28px); overflow-y: auto; }
+  .radius-all-panel.visible { display: block; }
+  .radius-all-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .radius-all-title { font-size: 15px; font-weight: 600; color: #1a2233; }
+  .radius-all-close { width: 26px; height: 26px; border: none; background: #f5f7fb; border-radius: 6px; cursor: pointer; font-size: 16px; color: #6b7a99; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .radius-all-close:hover { background: #e6ebf2; }
+  .radius-all-list { display: flex; flex-direction: column; gap: 24px; margin-bottom: 24px; }
+  .radius-all-segment { }
+  .radius-all-seg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .radius-all-seg-name { font-size: 13.5px; font-weight: 500; color: #1a2233; flex: 1; }
+  .radius-all-seg-val { font-size: 13px; font-weight: 600; color: #2b6cdf; white-space: nowrap; }
+  .radius-all-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: #e6ebf2; outline: none; cursor: pointer; display: block; }
+  .radius-all-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
+  .radius-all-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
+  .radius-all-footer { display: flex; gap: 8px; }
+  .radius-all-footer button { flex: 1; padding: 8px 0; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e6ebf2; }
 
   /* Zoom controls */
   .map-zoom { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
@@ -362,6 +384,23 @@
             <span class="map-metric-label">Approx. Frames</span>
             <span class="map-metric-value" id="metricFrames">—</span>
           </div>
+        </div>
+        <button class="metrics-radius-btn" id="metricsRadiusBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Change Radius
+        </button>
+      </div>
+
+      <!-- All-segments radius panel -->
+      <div class="radius-all-panel" id="radiusAllPanel">
+        <div class="radius-all-header">
+          <span class="radius-all-title">Change Radius</span>
+          <button class="radius-all-close" id="radiusAllClose">×</button>
+        </div>
+        <div class="radius-all-list" id="radiusAllList"></div>
+        <div class="radius-all-footer">
+          <button class="radius-btn-cancel" id="radiusAllCancel">Cancel</button>
+          <button class="radius-btn-apply" id="radiusAllApply">Apply</button>
         </div>
       </div>
       <div class="map-zoom">
@@ -1059,7 +1098,10 @@ function renderMetricsBar() {
 
   document.getElementById("metricAudience").textContent = (totalAud / 1000).toFixed(1) + "m";
   document.getElementById("metricFrames").textContent = (totalFrames / 1000).toFixed(1) + "k";
-  bar.classList.remove("hidden");
+  // Don't show metrics bar while the radius panel is open
+  if (!document.getElementById("radiusAllPanel").classList.contains("visible")) {
+    bar.classList.remove("hidden");
+  }
 }
 
 /* ------------ Search filter ------------ */
@@ -1144,6 +1186,68 @@ document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut()
 
 setTimeout(() => map.invalidateSize(), 100);
 window.addEventListener("resize", () => map.invalidateSize());
+
+/* ------------ All-segments radius panel ------------ */
+let radiusAllOriginal = {}; // snapshot of scales before opening
+
+function openRadiusAllPanel() {
+  // Save current scales so Cancel can restore them
+  radiusAllOriginal = {};
+  state.selectionOrder.forEach(id => {
+    radiusAllOriginal[id] = segmentRadiusScale[id] || 1.0;
+  });
+
+  const list = document.getElementById("radiusAllList");
+  list.innerHTML = "";
+
+  state.selectionOrder.forEach(id => {
+    const color = colorForSegment(id);
+    const label = findLabelById(id);
+    const base = defaultRadiusForSegment(id);
+    const currentRadius = Math.round(base * (segmentRadiusScale[id] || 1.0));
+
+    const seg = document.createElement("div");
+    seg.className = "radius-all-segment";
+    seg.innerHTML = `
+      <div class="radius-all-seg-header">
+        <span class="map-metrics-dot" style="background:${color.fill};width:9px;height:9px;flex-shrink:0"></span>
+        <span class="radius-all-seg-name">${label}</span>
+        <span class="radius-all-seg-val" id="rval_${id}">${currentRadius}m</span>
+      </div>
+      <input type="range" class="radius-all-slider" min="50" max="800" step="10" value="${currentRadius}" data-id="${id}" data-base="${base}" style="background:linear-gradient(to right,#2b6cdf ${((currentRadius-50)/750)*100}%,#e6ebf2 ${((currentRadius-50)/750)*100}%)" />`;
+    list.appendChild(seg);
+
+    seg.querySelector("input").addEventListener("input", function() {
+      const r = parseInt(this.value);
+      document.getElementById("rval_" + id).textContent = r + "m";
+      segmentRadiusScale[id] = r / base;
+      const pct = ((r - 50) / 750) * 100;
+      this.style.background = `linear-gradient(to right,#2b6cdf ${pct}%,#e6ebf2 ${pct}%)`;
+      renderMap();
+      renderMetricsBar();
+    });
+  });
+
+  document.getElementById("mapMetricsBar").classList.add("hidden");
+  document.getElementById("radiusAllPanel").classList.add("visible");
+}
+
+function closeRadiusAllPanel(apply) {
+  if (!apply) {
+    // Restore original scales
+    state.selectionOrder.forEach(id => {
+      segmentRadiusScale[id] = radiusAllOriginal[id];
+    });
+    renderMap();
+  }
+  document.getElementById("radiusAllPanel").classList.remove("visible");
+  renderMetricsBar(); // re-shows metrics bar if segments exist
+}
+
+document.getElementById("metricsRadiusBtn").addEventListener("click", openRadiusAllPanel);
+document.getElementById("radiusAllClose").addEventListener("click", () => closeRadiusAllPanel(false));
+document.getElementById("radiusAllCancel").addEventListener("click", () => closeRadiusAllPanel(false));
+document.getElementById("radiusAllApply").addEventListener("click", () => closeRadiusAllPanel(true));
 </script>
 </body>
 </html>

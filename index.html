@@ -88,7 +88,7 @@
   .segment-node[data-depth="0"] { border-bottom: 1px solid #e6ebf2; }
   .segment-node[data-depth="0"]:last-child { border-bottom: none; }
 
-  .segment-row { display: flex; align-items: center; gap: 8px; padding: 13px 18px; cursor: pointer; font-size: 15px; color: #1a2233; transition: color 0.1s, background 0.1s; position: relative; }
+  .segment-row { display: flex; align-items: center; gap: 8px; padding: 13px 18px; cursor: pointer; font-size: 15px; color: #1a2233; transition: color 0.1s, background 0.1s; position: relative; isolation: isolate; }
   .segment-row:not([data-depth="0"]):hover { color: #2b6cdf; background: transparent; }
   .segment-row:not([data-depth="0"]):hover::before { content: ''; position: absolute; left: 6px; right: 6px; top: 0; bottom: 0; background: #eaf1fc; border-radius: 8px; z-index: -1; }
   .segment-row:not([data-depth="0"]):hover .pin { color: #2b6cdf; }

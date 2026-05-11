@@ -98,6 +98,34 @@
   .metrics-totals { display: flex; align-items: baseline; gap: 6px; font-size: 12.5px; color: #6b7a99; }
   .metrics-total-val { font-size: 17px; font-weight: 600; color: #1a2233; }
   .metrics-total-sep { margin: 0 16px; color: #e6ebf2; }
+  .metrics-radius-btn { width: 100%; margin-top: 12px; padding: 7px 0; border-radius: 8px; border: 1px solid #e6ebf2; background: #fff; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.12s, border-color 0.12s; }
+  .metrics-radius-btn:hover { background: #f5f7fb; border-color: #c8d0e0; color: #1a2233; }
+
+  /* All-segments radius panel (index3) */
+  .radius-all-panel { position: absolute; bottom: 14px; right: 14px; background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); z-index: 600; padding: 18px 22px 16px; display: none; min-width: 380px; max-height: calc(100% - 28px); overflow-y: auto; }
+  .radius-all-panel.visible { display: block; }
+  .radius-all-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .radius-all-title { font-size: 15px; font-weight: 600; color: #1a2233; }
+  .radius-all-close { width: 26px; height: 26px; border: none; background: #f5f7fb; border-radius: 6px; cursor: pointer; font-size: 16px; color: #6b7a99; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .radius-all-close:hover { background: #e6ebf2; }
+  .radius-all-apply-all { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid #e6ebf2; }
+  .radius-all-apply-all input { flex: 1; padding: 9px 10px; border: 1.5px solid #d2d8e3; border-radius: 8px; font-size: 13px; color: #1a2233; outline: none; }
+  .radius-all-apply-all input:focus { border-color: #2b6cdf; }
+  .radius-all-apply-all button { padding: 9px 16px; border-radius: 8px; border: 1.5px solid #2b6cdf; background: #fff; color: #2b6cdf; font-size: 13px; font-weight: 400; cursor: pointer; white-space: nowrap; }
+  .radius-all-apply-all button:hover { background: #f0f5ff; }
+  .radius-all-list { display: flex; flex-direction: column; gap: 32px; margin-bottom: 24px; }
+  .radius-all-seg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .radius-all-seg-name { font-size: 13.5px; font-weight: 500; color: #1a2233; flex: 1; }
+  .radius-all-seg-val { font-size: 13px; font-weight: 600; color: #2b6cdf; white-space: nowrap; }
+  .radius-all-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: #e6ebf2; outline: none; cursor: pointer; display: block; }
+  .radius-all-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
+  .radius-all-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
+  .radius-all-footer { display: flex; gap: 8px; }
+  .radius-all-footer button { flex: 1; padding: 10px 0; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; border: 1px solid #e6ebf2; }
+  .radius-all-cancel { background: #fff; color: #4a5878; }
+  .radius-all-cancel:hover { background: #f5f7fb; }
+  .radius-all-apply { background: #2b6cdf; color: #fff; border-color: #2b6cdf !important; }
+  .radius-all-apply:hover { background: #2057bd; }
 
   /* Zoom */
   .map-zoom { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
@@ -111,36 +139,54 @@
   .cluster-icon { border-radius: 50%; background: #2b6cdf; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: 0 2px 10px rgba(43,108,223,0.45); border: 2.5px solid rgba(255,255,255,0.8); }
   .cluster-sm  { width: 34px; height: 34px; font-size: 12px; }
   .cluster-md  { width: 44px; height: 44px; font-size: 13px; }
-  .cluster-lg  { width: 56px; height: 56px; font-size: 14px; }
-  .cluster-xl  { width: 68px; height: 68px; font-size: 15px; }
-  .marker-single { width: 10px; height: 10px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(43,108,223,0.5); }
+  .cluster-lg  { width: 54px; height: 54px; font-size: 14px; }
+  .cluster-xl  { width: 64px; height: 64px; font-size: 15px; }
+  .marker-single { width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.55); cursor: pointer; }
+  /* Frame popup */
+  .frame-popup { position: absolute; z-index: 650; background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; box-shadow: 0 4px 16px rgba(0,0,0,0.13); padding: 10px 13px 11px; pointer-events: none; transform: translate(-50%, calc(-100% - 14px)); white-space: nowrap; }
+  .frame-popup-name { font-size: 13px; font-weight: 600; color: #1a2233; margin-bottom: 3px; }
+  .frame-popup-addr { font-size: 11.5px; color: #9aa3b5; }
 
   /* Filter panel */
   .filter-overlay { position: fixed; inset: 0; background: rgba(30,35,50,0.35); z-index: 800; display: none; }
   .filter-overlay.open { display: block; }
-  .filter-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 360px; background: #fff; z-index: 801; display: flex; flex-direction: column; box-shadow: -6px 0 32px rgba(0,0,0,0.14); transform: translateX(100%); transition: transform 0.22s ease; }
+  .filter-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 580px; background: #fff; z-index: 801; display: flex; flex-direction: column; box-shadow: -6px 0 32px rgba(0,0,0,0.14); transform: translateX(100%); transition: transform 0.22s ease; }
   .filter-panel.open { transform: translateX(0); }
   .filter-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 24px 18px; border-bottom: 1px solid #e6ebf2; flex-shrink: 0; }
   .filter-panel-title { font-size: 18px; font-weight: 700; color: #1a2233; }
   .filter-panel-add { width: 30px; height: 30px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #4a5878; font-size: 20px; display: flex; align-items: center; justify-content: center; }
   .filter-panel-add:hover { background: #f0f3f8; }
-  .filter-panel-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 22px; }
-  .filter-section-label { font-size: 13px; font-weight: 600; color: #1a2233; margin-bottom: 10px; }
-  .filter-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-  .filter-input { padding: 8px 12px; border: 1px solid #d2d8e3; border-radius: 7px; font-size: 13px; color: #1a2233; text-align: center; width: 100%; }
-  .filter-input:focus { outline: none; border-color: #2b6cdf; }
-  .filter-input::placeholder { color: #b0b9cc; }
-  .dual-range-wrap { position: relative; height: 20px; margin-bottom: 4px; }
-  .dual-range-track { position: absolute; top: 8px; left: 0; right: 0; height: 4px; background: #e6ebf2; border-radius: 3px; }
-  .dual-range-fill { position: absolute; top: 8px; height: 4px; background: #2b6cdf; border-radius: 3px; }
-  .dual-range-wrap input[type="range"] { position: absolute; top: 0; width: 100%; pointer-events: none; -webkit-appearance: none; appearance: none; background: transparent; height: 20px; margin: 0; }
-  .dual-range-wrap input[type="range"]::-webkit-slider-thumb { pointer-events: all; -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(43,108,223,0.4); cursor: pointer; }
-  .dual-range-wrap input[type="range"]::-moz-range-thumb { pointer-events: all; width: 14px; height: 14px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; cursor: pointer; box-shadow: 0 1px 4px rgba(43,108,223,0.4); }
-  .filter-range-labels { display: flex; justify-content: space-between; font-size: 11.5px; color: #9aa3b5; margin-top: 2px; }
+  .filter-panel-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .filter-panel-subtitle { font-size: 13.5px; color: #6b7a99; margin-bottom: 4px; }
+  .channel-card { border: 1.5px solid #e6ebf2; border-radius: 10px; overflow: hidden; }
+  .channel-card.selected { border-color: #d2d8e3; }
+  .channel-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+  .channel-card-name { font-size: 15px; font-weight: 600; color: #1a2233; }
+  .channel-checkbox { width: 20px; height: 20px; border-radius: 5px; border: 2px solid #d2d8e3; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.12s, border-color 0.12s; }
+  .channel-checkbox.checked { background: #2b6cdf; border-color: #2b6cdf; }
+  .channel-card-fields { padding: 0 16px 20px; display: flex; flex-direction: column; gap: 20px; }
+  .channel-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .channel-field-label { font-size: 12px; color: #6b7a99; margin-bottom: 8px; font-weight: 500; }
+  .channel-select { width: 100%; padding: 8px 30px 8px 10px; border: 1.5px solid #d2d8e3; border-radius: 7px; font-size: 13px; color: #1a2233; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; appearance: none; -webkit-appearance: none; cursor: pointer; }
+  .channel-select:focus { outline: none; border-color: #2b6cdf; }
+  .perf-index-section { margin-top: 4px; }
+  .perf-index-label { font-size: 13px; font-weight: 700; color: #1a2233; margin-bottom: 10px; }
+  .perf-index-card { border: 1.5px solid #d2d8e3; border-radius: 10px; padding: 16px 16px 14px; }
+  .pi-track-wrap { position: relative; height: 28px; margin-bottom: 10px; user-select: none; }
+  .pi-track-bg { position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: #d2d8e3; border-radius: 2px; transform: translateY(-50%); pointer-events: none; }
+  .pi-fill { position: absolute; top: 50%; height: 4px; background: #2b6cdf; border-radius: 2px; transform: translateY(-50%); pointer-events: none; }
+  .pi-thumb { position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 50%; background: #2b6cdf; border: 2.5px solid #fff; box-shadow: 0 1px 6px rgba(43,108,223,0.35); transform: translate(-50%, -50%); cursor: grab; z-index: 2; }
+  .pi-thumb:active { cursor: grabbing; }
+  .pi-range-vals { display: flex; justify-content: space-between; font-size: 12px; color: #9aa3b5; margin-bottom: 14px; }
+  .pi-inputs { display: flex; gap: 10px; }
+  .pi-input-wrap { flex: 1; display: flex; align-items: center; border: 1.5px solid #d2d8e3; border-radius: 8px; padding: 9px 12px; gap: 8px; }
+  .pi-input-wrap input { border: none; outline: none; font-size: 13.5px; color: #1a2233; width: 100%; background: transparent; }
+  .pi-input-clear { background: none; border: none; cursor: pointer; color: #b0b9cc; font-size: 15px; line-height: 1; padding: 0; flex-shrink: 0; }
+  .pi-input-clear:hover { color: #6b7a99; }
   .filter-panel-footer { padding: 16px 24px; border-top: 1px solid #e6ebf2; display: flex; gap: 10px; flex-shrink: 0; }
-  .filter-cancel { flex: 1; padding: 9px 0; border-radius: 8px; border: 1px solid #d2d8e3; background: #fff; font-size: 13.5px; font-weight: 500; color: #4a5878; cursor: pointer; }
+  .filter-cancel { flex: 1; padding: 10px 0; border-radius: 8px; border: 1px solid #e6ebf2; background: #fff; font-size: 15px; font-weight: 500; color: #4a5878; cursor: pointer; }
   .filter-cancel:hover { background: #f5f7fb; }
-  .filter-apply { flex: 1; padding: 9px 0; border-radius: 8px; border: none; background: #2b6cdf; font-size: 13.5px; font-weight: 500; color: #fff; cursor: pointer; }
+  .filter-apply { flex: 1; padding: 10px 0; border-radius: 8px; border: 1px solid #2b6cdf; background: #2b6cdf; font-size: 15px; font-weight: 500; color: #fff; cursor: pointer; }
   .filter-apply:hover { background: #2057bd; }
 
   /* Time-of-day slider (Frames mode) */
@@ -297,7 +343,6 @@
         </button>
         <div class="pill-group">
           <button class="pill active">POIs</button>
-          <button class="pill">Frames</button>
           <button class="pill">Heatmaps</button>
           <button class="pill">Postcodes</button>
         </div>
@@ -323,6 +368,25 @@
 
         <!-- Custom POI popup -->
         <div id="poiPopup" class="poi-float" style="display:none"></div>
+        <!-- Frame popup -->
+        <div id="framePopup" class="frame-popup" style="display:none"></div>
+
+        <!-- All-segments radius panel -->
+        <div class="radius-all-panel" id="radiusAllPanel">
+          <div class="radius-all-header">
+            <span class="radius-all-title">Change Radius</span>
+            <button class="radius-all-close" id="radiusAllClose">×</button>
+          </div>
+          <div class="radius-all-apply-all">
+            <input type="number" id="radiusApplyAllInput" placeholder="Set all radii (m)" min="50" max="800" step="10" />
+            <button id="radiusApplyAllBtn">Apply To All</button>
+          </div>
+          <div class="radius-all-list" id="radiusAllList"></div>
+          <div class="radius-all-footer">
+            <button class="radius-all-cancel" id="radiusAllCancel">Cancel</button>
+            <button class="radius-all-apply" id="radiusAllApply">Set Radius</button>
+          </div>
+        </div>
 
         <!-- Time-of-day slider (Frames mode) -->
         <div class="time-slider-wrap" id="timeSliderWrap">
@@ -358,12 +422,113 @@
 <div class="filter-overlay" id="filterOverlay"></div>
 <div class="filter-panel" id="filterPanel">
   <div class="filter-panel-header">
-    <span class="filter-panel-title">Filters</span>
+    <span class="filter-panel-title">Edit Channels</span>
+    <button class="filter-panel-add" id="filterClose" style="font-size:18px; color:#6b7a99;">×</button>
   </div>
-  <div class="filter-panel-body" id="filterBody"></div>
+  <div class="filter-panel-body" id="filterBody">
+    <p class="filter-panel-subtitle">Select and configure the channels for your line item.</p>
+    <div class="channel-card selected" id="doohCard">
+      <div class="channel-card-header">
+        <span class="channel-card-name">DOOH</span>
+      </div>
+      <div class="channel-card-fields">
+        <div class="channel-field-row">
+          <div>
+            <div class="channel-field-label">Environment</div>
+            <select class="channel-select" id="doohEnvironment">
+              <option>Underground Station</option>
+              <option>Street Furniture</option>
+              <option>Roadside Billboard</option>
+              <option>Shopping Centre</option>
+              <option>Airport</option>
+              <option>Rail Station</option>
+            </select>
+          </div>
+          <div>
+            <div class="channel-field-label">Format</div>
+            <select class="channel-select" id="doohFormat">
+              <option>Portrait</option>
+              <option>Landscape</option>
+              <option>Square</option>
+              <option>Large Format</option>
+            </select>
+          </div>
+        </div>
+        <div class="channel-field-row">
+          <div>
+            <div class="channel-field-label">TV Regions</div>
+            <select class="channel-select" id="doohTVRegions">
+              <option>Central West Midlands</option>
+              <option>London</option>
+              <option>North West</option>
+              <option>Yorkshire</option>
+              <option>South East</option>
+              <option>Scotland</option>
+            </select>
+          </div>
+          <div>
+            <div class="channel-field-label">Locations</div>
+            <select class="channel-select" id="doohLocations">
+              <option>London</option>
+              <option>Manchester</option>
+              <option>Birmingham</option>
+              <option>Leeds</option>
+              <option>Glasgow</option>
+              <option>Bristol</option>
+            </select>
+          </div>
+        </div>
+        <div class="channel-field-row">
+          <div>
+            <div class="channel-field-label">Conurbations</div>
+            <select class="channel-select" id="doohConurbations">
+              <option>Manchester Area</option>
+              <option>Greater London</option>
+              <option>West Midlands</option>
+              <option>West Yorkshire</option>
+              <option>Greater Glasgow</option>
+            </select>
+          </div>
+          <div>
+            <div class="channel-field-label">Media Owner</div>
+            <select class="channel-select" id="doohMediaOwner">
+              <option>Goldbach DE</option>
+              <option>Clear Channel</option>
+              <option>JCDecaux</option>
+              <option>Lamar</option>
+              <option>Outfront Media</option>
+            </select>
+          </div>
+        </div>
+        <div class="perf-index-section">
+          <div class="perf-index-label">Performance Index</div>
+          <div class="pi-track-wrap" id="piTrackWrap">
+            <div class="pi-track-bg"></div>
+            <div class="pi-fill" id="piFill"></div>
+            <div class="pi-thumb" id="piThumbLo"></div>
+            <div class="pi-thumb" id="piThumbHi"></div>
+          </div>
+          <div class="pi-range-vals">
+            <span id="piValLo">3.4500</span>
+            <span id="piValHi">5.4567</span>
+          </div>
+          <div class="pi-inputs">
+            <div class="pi-input-wrap">
+              <input type="text" id="piInputLo" value="3.5632" />
+              <button class="pi-input-clear" id="piClearLo">×</button>
+            </div>
+            <div class="pi-input-wrap">
+              <input type="text" id="piInputHi" value="4.9876" />
+              <button class="pi-input-clear" id="piClearHi">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="filter-panel-footer">
     <button class="filter-cancel" id="filterCancel">Cancel</button>
-    <button class="filter-apply">Apply</button>
+    <button class="filter-apply">Save</button>
   </div>
 </div>
 
@@ -456,6 +621,11 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
   maxZoom: 19,
 }).addTo(map);
 
+// Custom pane above markers (600) so circles render on top of cluster dots
+map.createPane('circlesPane');
+map.getPane('circlesPane').style.zIndex = 620;
+map.getPane('circlesPane').style.pointerEvents = 'none'; // pass clicks through to clusters below
+
 const circleLayer = L.layerGroup().addTo(map);
 
 function clusterPOIs(id) {
@@ -502,12 +672,25 @@ function renderMap() {
     const { aud, fr } = segmentMetrics(id);
     clusterPOIs(id).forEach(cluster => {
       const r = effectiveRadius(id, cluster.radius);
-      const circle = L.circle([cluster.lat, cluster.lng], {
-        radius: r, color: stroke, weight: 2, fillColor: fill,
-        fillOpacity: 0.10 + cluster.intensity * 0.18,
+      // Circle on custom pane above clusters — explicitly disable pointer-events on the SVG path
+      // (CSS pointer-events:none on the pane div is not inherited by SVG children)
+      const radiusCircle = L.circle([cluster.lat, cluster.lng], {
+        radius: r,
+        color: stroke, weight: 3, opacity: 0.85,
+        fillColor: fill, fillOpacity: 0.08 + cluster.intensity * 0.12,
         bubblingMouseEvents: false,
+        interactive: false,
+        pane: 'circlesPane',
       });
-      circle.on('click', (e) => {
+      radiusCircle.addTo(circleLayer);
+      if (radiusCircle._path) radiusCircle._path.style.pointerEvents = 'none';
+
+      // Invisible click target at circle center (in normal marker pane so events work)
+      const clickTarget = L.circleMarker([cluster.lat, cluster.lng], {
+        radius: 14, color: 'transparent', fillColor: 'transparent',
+        fillOpacity: 0, opacity: 0, bubblingMouseEvents: false,
+      });
+      clickTarget.on('click', (e) => {
         L.DomEvent.stopPropagation(e);
         const { aud, fr } = segmentMetrics(id);
         const pt = map.latLngToContainerPoint([cluster.lat, cluster.lng]);
@@ -531,7 +714,7 @@ function renderMap() {
         popup.style.top  = pt.y + 'px';
         popup.style.display = 'block';
       });
-      circle.addTo(circleLayer);
+      clickTarget.addTo(circleLayer);
     });
   });
 }
@@ -564,14 +747,21 @@ function renderMetrics() {
       Audience Size <span class="metrics-total-val">${(totalAud/1000).toFixed(1)}m</span>
       <span class="metrics-total-sep">|</span>
       Approx. Frames <span class="metrics-total-val">${(totalFrames/1000).toFixed(1)}k</span>
-    </div>`;
-  card.classList.add("visible");
+    </div>
+    <button class="metrics-radius-btn" id="metricsRadiusBtn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Change Radius
+    </button>`;
+  if (!document.getElementById("radiusAllPanel").classList.contains("visible")) {
+    card.classList.add("visible");
+  }
+  document.getElementById("metricsRadiusBtn").addEventListener("click", openRadiusAllPanel);
 }
 
 document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
 document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut());
-map.on("click", () => { document.getElementById("poiPopup").style.display = "none"; });
-map.on("movestart", () => { document.getElementById("poiPopup").style.display = "none"; });
+map.on("click", () => { document.getElementById("poiPopup").style.display = "none"; document.getElementById("framePopup").style.display = "none"; });
+map.on("movestart", () => { document.getElementById("poiPopup").style.display = "none"; document.getElementById("framePopup").style.display = "none"; });
 
 /* ------------ Heatmap ------------ */
 function renderHeatmap() {
@@ -615,18 +805,18 @@ let clusterGroup = null;
 
 function renderFrames() {
   if (clusterGroup) { map.removeLayer(clusterGroup); clusterGroup = null; }
-  circleLayer.clearLayers();
 
   clusterGroup = L.markerClusterGroup({
-    maxClusterRadius: 60,
+    maxClusterRadius: 20,
+    disableClusteringAtZoom: 17,
     spiderfyOnMaxZoom: false,
     showCoverageOnHover: false,
     iconCreateFunction(cluster) {
       const n = cluster.getChildCount();
       let cls = "cluster-sm", size = 34;
       if (n > 20)  { cls = "cluster-md"; size = 44; }
-      if (n > 80)  { cls = "cluster-lg"; size = 56; }
-      if (n > 150) { cls = "cluster-xl"; size = 68; }
+      if (n > 80)  { cls = "cluster-lg"; size = 54; }
+      if (n > 150) { cls = "cluster-xl"; size = 64; }
       return L.divIcon({
         html: `<div class="cluster-icon ${cls}">${n}</div>`,
         className: "",
@@ -636,14 +826,69 @@ function renderFrames() {
     },
   });
 
+  const FRAME_NAMES = [
+    ["Blue Bottle Coffee","66 Mint St, San Francisco, CA 94103"],
+    ["Sightglass Coffee","270 7th St, San Francisco, CA 94103"],
+    ["Tartine Bakery","600 Guerrero St, San Francisco, CA 94110"],
+    ["Philz Coffee","201 Berry St, San Francisco, CA 94158"],
+    ["Ritual Coffee","1026 Valencia St, San Francisco, CA 94110"],
+    ["Equator Coffees","986 Market St, San Francisco, CA 94102"],
+    ["Starbucks Reserve","Embarcadero Center, San Francisco, CA 94111"],
+    ["Peet's Coffee","2197 Market St, San Francisco, CA 94114"],
+    ["The Mill","736 Divisadero St, San Francisco, CA 94117"],
+    ["Dandelion Chocolate","740 Valencia St, San Francisco, CA 94110"],
+    ["Craftsman & Wolves","746 Valencia St, San Francisco, CA 94110"],
+    ["Marla Bakery","3619 Balboa St, San Francisco, CA 94121"],
+    ["Nopa Restaurant","560 Divisadero St, San Francisco, CA 94117"],
+    ["Zuni Café","1658 Market St, San Francisco, CA 94102"],
+    ["Foreign Cinema","2534 Mission St, San Francisco, CA 94110"],
+    ["State Bird Provisions","1529 Fillmore St, San Francisco, CA 94115"],
+    ["Rich Table","199 Gough St, San Francisco, CA 94102"],
+    ["Cotogna","490 Pacific Ave, San Francisco, CA 94133"],
+    ["Bix Restaurant","56 Gold St, San Francisco, CA 94133"],
+    ["The Progress","1525 Fillmore St, San Francisco, CA 94115"],
+    ["Neighbor Bakehouse","2343 3rd St, San Francisco, CA 94107"],
+    ["Acme Bread Company","1 Ferry Building, San Francisco, CA 94111"],
+    ["Ferry Building Marketplace","1 Ferry Building, San Francisco, CA 94111"],
+    ["Heath Ceramics","2 Henry Adams St, San Francisco, CA 94103"],
+    ["Adobe Books","3166 16th St, San Francisco, CA 94103"],
+  ];
+
+  const framePopup = document.getElementById("framePopup");
+  let frameIdx = 0;
+
   const pts = getAllPOIPoints();
   pts.forEach(({ lat, lng, radius, intensity }, i) => {
-    const count = Math.round(8 + intensity * 28);
     const radiusDeg = radius / 111000;
-    generateFrames(lat, lng, count, radiusDeg, 1000 + i).forEach(([fLat, fLng]) => {
-      clusterGroup.addLayer(L.marker([fLat, fLng], {
-        icon: L.divIcon({ html: '<div class="marker-single"></div>', className: "", iconSize: [10, 10], iconAnchor: [5, 5] }),
-      }));
+    const rand = seededRand(500 + i);
+    // Main cluster + satellite sub-clusters spread across the radius
+    const subCenters = [[lat, lng]];
+    const subCount = 4 + Math.floor(intensity * 3);
+    for (let s = 0; s < subCount; s++) {
+      const sr = radiusDeg * (0.42 + 0.52 * Math.sqrt(rand()));
+      const sθ = rand() * 2 * Math.PI;
+      subCenters.push([lat + sr * Math.sin(sθ), lng + sr * Math.cos(sθ)]);
+    }
+    subCenters.forEach(([ cLat, cLng ], s) => {
+      const count = Math.round(7 + intensity * 14);
+      const spread = radiusDeg * (s === 0 ? 0.14 : 0.11);
+      generateFrames(cLat, cLng, count, spread, 1000 + i * 10 + s).forEach(([fLat, fLng]) => {
+        const [name, addr] = FRAME_NAMES[frameIdx % FRAME_NAMES.length];
+        frameIdx++;
+        const marker = L.marker([fLat, fLng], {
+          icon: L.divIcon({ html: '<div class="marker-single"></div>', className: "", iconSize: [20, 20], iconAnchor: [10, 10] }),
+        });
+        marker.on("click", (e) => {
+          L.DomEvent.stopPropagation(e);
+          document.getElementById("poiPopup").style.display = "none";
+          const pt = map.latLngToContainerPoint([fLat, fLng]);
+          framePopup.innerHTML = `<div class="frame-popup-name">${name}</div><div class="frame-popup-addr">${addr}</div>`;
+          framePopup.style.left = pt.x + "px";
+          framePopup.style.top  = pt.y + "px";
+          framePopup.style.display = "block";
+        });
+        clusterGroup.addLayer(marker);
+      });
     });
   });
 
@@ -682,7 +927,6 @@ function _postcodeStyle(feature, pts) {
 }
 
 function renderPostcodes() {
-  clearCluster();
   circleLayer.clearLayers();
   const pts = getAllPOIPoints();
 
@@ -760,115 +1004,38 @@ document.querySelectorAll(".pill").forEach(p => {
     p.classList.add("active");
     const label = p.textContent.trim();
     const metrics = document.getElementById("mapMetrics");
-    const timeSlider = document.getElementById("timeSliderWrap");
     if (label === "Heatmaps") {
       activeMode = "heatmap";
+      clearCluster();
       renderHeatmap();
       metrics.classList.remove("visible");
-      timeSlider.classList.remove("visible");
-    } else if (label === "Frames") {
-      activeMode = "frames";
-      circleLayer.clearLayers();
-      renderFrames();
-      metrics.classList.remove("visible");
-      timeSlider.classList.add("visible");
     } else if (label === "Postcodes") {
       activeMode = "postcodes";
       clearCluster();
       renderPostcodes();
+      renderFrames();
       metrics.classList.remove("visible");
-      timeSlider.classList.remove("visible");
     } else {
       activeMode = "pois";
       clearCluster();
+      circleLayer.clearLayers();
       renderMap();
+      renderFrames();
       if (segments.length) renderMetrics(); else metrics.classList.remove("visible");
-      timeSlider.classList.remove("visible");
     }
   });
 });
 
-map.on("zoomend", () => { if (activeMode === "pois") renderMap(); });
+map.on("zoomend", () => {
+  if (activeMode === "pois") { renderMap(); renderFrames(); }
+  else if (activeMode === "postcodes") { renderPostcodes(); renderFrames(); }
+});
 
-setTimeout(() => { map.invalidateSize(); renderMap(); renderMetrics(); }, 100);
+setTimeout(() => { map.invalidateSize(); renderMap(); renderFrames(); renderMetrics(); }, 100);
 window.addEventListener("resize", () => map.invalidateSize());
 
-/* ------------ Filter panel ------------ */
-const filterSections = [
-  { label: "Effective CPM",  rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
-  { label: "Impacts",        rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
-  { label: "Concentration",  rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
-  { label: "CPCV",           rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
-  { label: "CPC",            rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
-  { label: "CTR",            rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
-  { label: "Viewability",    rangeMin: 0, rangeMax: 20, lo: 0, hi: 20 },
-];
-
-function buildFilterBody() {
-  const body = document.getElementById("filterBody");
-  body.innerHTML = filterSections.map((s, i) => `
-    <div>
-      <div class="filter-section-label">${s.label}</div>
-      <div class="filter-inputs">
-        <input class="filter-input" type="number" min="0" max="20" step="0.1" placeholder="Enter Min" value="${s.lo > 0 ? s.lo : ''}" data-idx="${i}" data-role="min" />
-        <input class="filter-input" type="number" min="0" max="20" step="0.1" placeholder="Enter Max" value="${s.hi < 20 ? s.hi : ''}" data-idx="${i}" data-role="max" />
-      </div>
-      <div class="dual-range-wrap" id="wrap-${i}">
-        <div class="dual-range-track"></div>
-        <div class="dual-range-fill" id="fill-${i}"></div>
-        <input type="range" min="0" max="20" step="0.1" value="${s.lo}" class="range-min" data-idx="${i}" />
-        <input type="range" min="0" max="20" step="0.1" value="${s.hi}" class="range-max" data-idx="${i}" />
-      </div>
-      <div class="filter-range-labels"><span>£0</span><span>£20</span></div>
-    </div>
-  `).join("");
-
-  filterSections.forEach((_, i) => updateFill(i));
-
-  body.querySelectorAll("input[type='range']").forEach(input => {
-    input.addEventListener("input", () => {
-      const i = +input.dataset.idx;
-      const wrap = document.getElementById(`wrap-${i}`);
-      const minR = wrap.querySelector(".range-min");
-      const maxR = wrap.querySelector(".range-max");
-      const lo = Math.min(+minR.value, +maxR.value);
-      const hi = Math.max(+minR.value, +maxR.value);
-      // Sync number inputs
-      const inputs = body.querySelectorAll(`.filter-input[data-idx="${i}"]`);
-      inputs[0].value = lo > 0 ? lo : '';
-      inputs[1].value = hi < 20 ? hi : '';
-      updateFill(i);
-    });
-  });
-
-  body.querySelectorAll(".filter-input").forEach(input => {
-    input.addEventListener("input", () => {
-      const i = +input.dataset.idx;
-      const wrap = document.getElementById(`wrap-${i}`);
-      const minR = wrap.querySelector(".range-min");
-      const maxR = wrap.querySelector(".range-max");
-      const allInputs = body.querySelectorAll(`.filter-input[data-idx="${i}"]`);
-      const rawMin = parseFloat(allInputs[0].value);
-      const rawMax = parseFloat(allInputs[1].value);
-      if (!isNaN(rawMin)) minR.value = Math.max(0, Math.min(20, rawMin));
-      if (!isNaN(rawMax)) maxR.value = Math.max(0, Math.min(20, rawMax));
-      updateFill(i);
-    });
-  });
-}
-
-function updateFill(i) {
-  const wrap = document.getElementById(`wrap-${i}`);
-  if (!wrap) return;
-  const lo = Math.min(+wrap.querySelector(".range-min").value, +wrap.querySelector(".range-max").value);
-  const hi = Math.max(+wrap.querySelector(".range-min").value, +wrap.querySelector(".range-max").value);
-  const fill = document.getElementById(`fill-${i}`);
-  fill.style.left  = (lo / 20 * 100) + "%";
-  fill.style.width = ((hi - lo) / 20 * 100) + "%";
-}
-
+/* ------------ Filter panel (Edit Channels / DOOH) ------------ */
 function openFilter() {
-  buildFilterBody();
   document.getElementById("filterOverlay").classList.add("open");
   document.getElementById("filterPanel").classList.add("open");
 }
@@ -880,7 +1047,69 @@ function closeFilter() {
 document.querySelector(".filter-btn").addEventListener("click", openFilter);
 document.getElementById("filterOverlay").addEventListener("click", closeFilter);
 document.getElementById("filterCancel").addEventListener("click", closeFilter);
+document.getElementById("filterClose").addEventListener("click", closeFilter);
 document.querySelector(".filter-apply").addEventListener("click", closeFilter);
+
+
+// Performance Index custom drag slider
+(function() {
+  const MIN = 0, MAX = 10;
+  let loVal = 3.45, hiVal = 5.4567;
+
+  const track    = document.getElementById("piTrackWrap");
+  const fill     = document.getElementById("piFill");
+  const thumbLo  = document.getElementById("piThumbLo");
+  const thumbHi  = document.getElementById("piThumbHi");
+  const valLo    = document.getElementById("piValLo");
+  const valHi    = document.getElementById("piValHi");
+  const inputLo  = document.getElementById("piInputLo");
+  const inputHi  = document.getElementById("piInputHi");
+
+  function pct(val) { return (val - MIN) / (MAX - MIN) * 100; }
+
+  function render() {
+    const loPct = pct(loVal), hiPct = pct(hiVal);
+    thumbLo.style.left = loPct + "%";
+    thumbHi.style.left = hiPct + "%";
+    fill.style.left    = loPct + "%";
+    fill.style.width   = (hiPct - loPct) + "%";
+    valLo.textContent  = loVal.toFixed(4);
+    valHi.textContent  = hiVal.toFixed(4);
+  }
+
+  function startDrag(e, which) {
+    e.preventDefault();
+    function onMove(ev) {
+      const rect = track.getBoundingClientRect();
+      const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const val = MIN + ratio * (MAX - MIN);
+      if (which === "lo") loVal = Math.min(val, hiVal - 0.0001);
+      else                 hiVal = Math.max(val, loVal + 0.0001);
+      render();
+    }
+    function onUp() {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup",   onUp);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend",  onUp);
+    }
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup",   onUp);
+    document.addEventListener("touchmove", onMove, { passive: false });
+    document.addEventListener("touchend",  onUp);
+  }
+
+  thumbLo.addEventListener("mousedown",  e => startDrag(e, "lo"));
+  thumbHi.addEventListener("mousedown",  e => startDrag(e, "hi"));
+  thumbLo.addEventListener("touchstart", e => startDrag(e, "lo"), { passive: false });
+  thumbHi.addEventListener("touchstart", e => startDrag(e, "hi"), { passive: false });
+
+  document.getElementById("piClearLo").addEventListener("click", () => { inputLo.value = ""; });
+  document.getElementById("piClearHi").addEventListener("click", () => { inputHi.value = ""; });
+
+  render();
+})();
 
 /* ------------ Time-of-day slider ------------ */
 (function() {
@@ -933,6 +1162,90 @@ document.querySelector(".filter-apply").addEventListener("click", closeFilter);
 
   setHour(9);
 })();
+
+/* ------------ All-segments radius panel (index3) ------------ */
+let radiusAllOriginal = {};
+
+function defaultRadiusForSegment3(id) {
+  const pois = segmentPOIs[id] || [];
+  if (!pois.length) return 200;
+  return Math.round(pois.reduce((s, [,,r]) => s + r, 0) / pois.length);
+}
+
+function openRadiusAllPanel() {
+  radiusAllOriginal = {};
+  segments.forEach(({ id }) => { radiusAllOriginal[id] = segmentRadiusScale[id] || 1.0; });
+
+  const list = document.getElementById("radiusAllList");
+  list.innerHTML = "";
+
+  segments.forEach(({ id, label }, idx) => {
+    const color = colorPalette[idx].fill;
+    const base = defaultRadiusForSegment3(id);
+    const currentRadius = Math.round(base * (segmentRadiusScale[id] || 1.0));
+    const pct = ((currentRadius - 50) / 750) * 100;
+
+    const seg = document.createElement("div");
+    seg.innerHTML = `
+      <div class="radius-all-seg-header">
+        <span class="metrics-dot" style="background:${color};width:9px;height:9px;flex-shrink:0"></span>
+        <span class="radius-all-seg-name">${label}</span>
+        <span class="radius-all-seg-val" id="rval3_${id}">${currentRadius}m</span>
+      </div>
+      <input type="range" class="radius-all-slider" min="50" max="800" step="10" value="${currentRadius}" data-id="${id}" data-base="${base}"
+        style="background:linear-gradient(to right,#2b6cdf ${pct}%,#e6ebf2 ${pct}%)" />`;
+    list.appendChild(seg);
+
+    seg.querySelector("input").addEventListener("input", function() {
+      const r = parseInt(this.value);
+      document.getElementById("rval3_" + id).textContent = r + "m";
+      segmentRadiusScale[id] = r / base;
+      const p = ((r - 50) / 750) * 100;
+      this.style.background = `linear-gradient(to right,#2b6cdf ${p}%,#e6ebf2 ${p}%)`;
+      renderMap();
+      renderFrames();
+      renderMetrics();
+    });
+  });
+
+  document.getElementById("mapMetrics").classList.remove("visible");
+  document.getElementById("radiusAllPanel").classList.add("visible");
+}
+
+function closeRadiusAllPanel(apply) {
+  if (!apply) {
+    segments.forEach(({ id }) => { segmentRadiusScale[id] = radiusAllOriginal[id]; });
+    renderMap();
+    renderFrames();
+  }
+  document.getElementById("radiusAllPanel").classList.remove("visible");
+  renderMetrics();
+}
+
+document.getElementById("radiusAllClose").addEventListener("click", () => closeRadiusAllPanel(false));
+document.getElementById("radiusAllCancel").addEventListener("click", () => closeRadiusAllPanel(false));
+document.getElementById("radiusAllApply").addEventListener("click", () => closeRadiusAllPanel(true));
+
+document.getElementById("radiusApplyAllBtn").addEventListener("click", () => {
+  const raw = parseInt(document.getElementById("radiusApplyAllInput").value);
+  if (isNaN(raw)) return;
+  const val = Math.max(50, Math.min(800, raw));
+  segments.forEach(({ id }) => {
+    const base = defaultRadiusForSegment3(id);
+    segmentRadiusScale[id] = val / base;
+    const slider = document.querySelector(`.radius-all-slider[data-id="${id}"]`);
+    if (slider) {
+      slider.value = val;
+      const p = ((val - 50) / 750) * 100;
+      slider.style.background = `linear-gradient(to right,#2b6cdf ${p}%,#e6ebf2 ${p}%)`;
+    }
+    const label = document.getElementById("rval3_" + id);
+    if (label) label.textContent = val + "m";
+  });
+  renderMap();
+  renderFrames();
+  renderMetrics();
+});
 </script>
 </body>
 </html>
