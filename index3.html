@@ -143,18 +143,19 @@
   .filter-apply { flex: 1; padding: 9px 0; border-radius: 8px; border: none; background: #2b6cdf; font-size: 13.5px; font-weight: 500; color: #fff; cursor: pointer; }
   .filter-apply:hover { background: #2057bd; }
 
-  /* POI popup — matches index1 stats panel style */
-  .leaflet-popup-content-wrapper.poi-popup-wrap { border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 0; border: none; }
+  /* POI popup — exact index1 stats panel styles */
+  .leaflet-popup-content-wrapper.poi-popup-wrap { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); padding: 0; border: 1px solid #e6ebf2; }
   .leaflet-popup-content-wrapper.poi-popup-wrap .leaflet-popup-content { margin: 0; }
   .leaflet-popup-tip-container { display: none; }
   .leaflet-popup-close-button { display: none; }
-  .poi-popup-seg { padding: 8px 10px 10px; }
-  .poi-popup-seg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 500; font-size: 13.5px; color: #1a2233; }
-  .poi-popup-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .poi-popup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  .poi-popup-card { background: #f5f7fb; border-radius: 9px; padding: 2px 6px 2px; }
-  .poi-popup-card-label { font-size: 11px; color: #9aa3b5; margin-bottom: 2px; }
-  .poi-popup-card-val { font-size: 17px; font-weight: 500; color: #1a2233; }
+  .stats-segment { padding: 18px 22px 20px; }
+  .stats-segment-header { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; font-weight: 500; font-size: 15.5px; color: #1a2233; }
+  .stats-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .stats-segment-name { flex: 1; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { background: #f5f7fb; border-radius: 10px; border: none; padding: 10px 13px 12px; }
+  .stat-label { font-size: 11.5px; color: #9aa3b5; margin-bottom: 4px; line-height: 1.3; }
+  .stat-value { font-size: 20px; font-weight: 500; color: #1a2233; }
 
 </style>
 </head>
@@ -474,19 +475,19 @@ function renderMap() {
         const { aud, fr } = segmentMetrics(id);
         L.popup({ className: 'poi-popup-wrap', maxWidth: 300, closeButton: false, offset: [0, -4] })
           .setLatLng([cluster.lat, cluster.lng])
-          .setContent(`<div class="poi-popup-seg">
-            <div class="poi-popup-seg-header">
-              <span class="poi-popup-dot" style="background:${fill}"></span>
-              <span>${label}</span>
+          .setContent(`<div class="stats-segment">
+            <div class="stats-segment-header">
+              <span class="stats-dot" style="background:${fill}"></span>
+              <span class="stats-segment-name">${label}</span>
             </div>
-            <div class="poi-popup-grid">
-              <div class="poi-popup-card">
-                <div class="poi-popup-card-label">Audience Size</div>
-                <div class="poi-popup-card-val">${(aud/1000).toFixed(1)}m</div>
+            <div class="stat-grid">
+              <div class="stat-card">
+                <div class="stat-label">Audience Size</div>
+                <div class="stat-value">${(aud/1000).toFixed(1)}m</div>
               </div>
-              <div class="poi-popup-card">
-                <div class="poi-popup-card-label">Approx. Frames</div>
-                <div class="poi-popup-card-val">${(fr/1000).toFixed(1)}k</div>
+              <div class="stat-card">
+                <div class="stat-label">Approx. Frames</div>
+                <div class="stat-value">${(fr/1000).toFixed(1)}k</div>
               </div>
             </div>
           </div>`)
