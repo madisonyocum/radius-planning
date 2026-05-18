@@ -67,17 +67,16 @@
 
   /* Map section */
   .map-section { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 0; background: #f5f7fb; }
-  .map-toolbar { display: flex; align-items: center; gap: 10px; padding: 14px 24px 12px; background: #fff; flex-shrink: 0; }
-  .map-toolbar-title { font-size: 19px; font-weight: 600; color: #1a2233; flex: 1; }
-  .filter-btn { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid #d2d8e3; background: #fff; font-size: 13px; color: #4a5878; cursor: pointer; font-weight: 500; }
-  .filter-btn:hover { background: #f5f7fb; }
-  .pill-group { display: flex; align-items: center; gap: 6px; }
-  .pill { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #d2d8e3; background: #fff; font-size: 13px; color: #4a5878; cursor: pointer; font-weight: 500; transition: all 0.1s; }
-  .pill:hover { border-color: #2b6cdf; color: #2b6cdf; }
-  .pill.active { border-color: #2b6cdf; color: #2b6cdf; background: #fff; }
+  /* Floating map controls block */
+  .map-controls-block { position: absolute; top: 14px; right: 14px; z-index: 500; display: flex; align-items: center; gap: 0; background: #fff; border: 1px solid #d2d8e3; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.10); }
+  .map-ctrl-btn { display: flex; align-items: center; gap: 7px; padding: 9px 18px; font-size: 14px; font-weight: 600; color: #4a5878; background: #fff; border: none; border-right: 1px solid #e6ebf2; cursor: pointer; white-space: nowrap; transition: background 0.1s, color 0.1s; }
+  .map-ctrl-select { display: flex; align-items: center; gap: 7px; padding: 9px 18px; font-size: 14px; font-weight: 600; color: #4a5878; background: #fff; border: none; border-right: 1px solid #e6ebf2; cursor: pointer; white-space: nowrap; outline: none; appearance: none; -webkit-appearance: none; font-family: inherit; }
+  .map-ctrl-btn:last-child { border-right: none; }
+  .map-ctrl-btn:hover { background: #f5f7fb; color: #1a2233; }
+  .map-ctrl-btn.active { background: #eef3fd; color: #2b6cdf; }
 
   /* Map container */
-  .map-wrap { flex: 1; position: relative; min-height: 0; margin: 0 10px 10px; border-radius: 10px; overflow: hidden; border: 1px solid #e6ebf2; }
+  .map-wrap { flex: 1; position: relative; min-height: 0; margin: 10px 10px 10px; border-radius: 10px; overflow: hidden; border: 1px solid #e6ebf2; touch-action: none; }
   #map { width: 100%; height: 100%; }
 
   /* Legend */
@@ -86,23 +85,25 @@
   .legend-labels { display: flex; justify-content: space-between; font-size: 11px; color: #6b7a99; width: 140px; }
 
   /* Metrics card */
-  .map-metrics { position: absolute; bottom: 14px; right: 14px; background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); z-index: 500; padding: 16px 20px; min-width: 280px; display: none; }
+  .map-bottom-stack { position: absolute; bottom: 14px; right: 14px; z-index: 500; display: flex; flex-direction: column; gap: 8px; min-width: 520px; }
+  .map-metrics { background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); padding: 18px 22px 14px; display: none; }
   .map-metrics.visible { display: block; }
-  .metrics-segments { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-  .metrics-seg-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #1a2233; }
-  .metrics-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .metrics-vals { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-  .metrics-val { font-size: 12px; color: #6b7a99; }
-  .metrics-val strong { color: #1a2233; font-weight: 600; }
+  .metrics-segments { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+  .metrics-seg-row { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 500; color: #1a2233; }
+  .metrics-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .metrics-vals { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+  .metrics-val { font-size: 12px; color: #9aa3b5; display: flex; align-items: baseline; gap: 3px; }
+  .metrics-val strong { color: #1a2233; font-weight: 600; font-size: 13px; }
   .metrics-divider { height: 1px; background: #e6ebf2; margin-bottom: 12px; }
-  .metrics-totals { display: flex; align-items: baseline; gap: 6px; font-size: 12.5px; color: #6b7a99; }
-  .metrics-total-val { font-size: 17px; font-weight: 600; color: #1a2233; }
-  .metrics-total-sep { margin: 0 16px; color: #e6ebf2; }
-  .metrics-radius-btn { width: 100%; margin-top: 12px; padding: 7px 0; border-radius: 8px; border: 1px solid #e6ebf2; background: #fff; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.12s, border-color 0.12s; }
-  .metrics-radius-btn:hover { background: #f5f7fb; border-color: #c8d0e0; color: #1a2233; }
+  .metrics-footer { display: flex; align-items: center; }
+  .metrics-totals { display: flex; align-items: baseline; gap: 6px; font-size: 12px; color: #6b7a99; flex: 1; }
+  .metrics-total-val { font-size: 17px; font-weight: 700; color: #1a2233; }
+  .metrics-total-sep { margin: 0 12px; color: #d2d8e3; }
+  .metrics-radius-btn { padding: 7px 16px; border-radius: 8px; border: 1px solid #d2d8e3; background: #fff; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.12s; flex-shrink: 0; }
+  .metrics-radius-btn:hover { background: #f5f7fb; color: #1a2233; }
 
   /* All-segments radius panel (index3) */
-  .radius-all-panel { position: absolute; bottom: 14px; right: 14px; background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); z-index: 600; padding: 18px 22px 16px; display: none; min-width: 380px; max-height: calc(100% - 28px); overflow-y: auto; }
+  .radius-all-panel { background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); z-index: 600; padding: 18px 22px 16px; display: none; max-height: 400px; overflow-y: auto; }
   .radius-all-panel.visible { display: block; }
   .radius-all-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
   .radius-all-title { font-size: 15px; font-weight: 600; color: #1a2233; }
@@ -115,20 +116,20 @@
   .radius-all-apply-all button:hover { background: #f0f5ff; }
   .radius-all-list { display: flex; flex-direction: column; gap: 32px; margin-bottom: 24px; }
   .radius-all-seg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .radius-all-seg-name { font-size: 13.5px; font-weight: 500; color: #1a2233; flex: 1; }
+  .radius-all-seg-name { font-size: 15px; font-weight: 500; color: #1a2233; flex: 1; }
   .radius-all-seg-val { font-size: 13px; font-weight: 600; color: #2b6cdf; white-space: nowrap; }
   .radius-all-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: #e6ebf2; outline: none; cursor: pointer; display: block; }
   .radius-all-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
   .radius-all-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
   .radius-all-footer { display: flex; gap: 8px; }
-  .radius-all-footer button { flex: 1; padding: 10px 0; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; border: 1px solid #e6ebf2; }
+  .radius-all-footer button { flex: 1; padding: 7px 0; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e6ebf2; }
   .radius-all-cancel { background: #fff; color: #4a5878; }
   .radius-all-cancel:hover { background: #f5f7fb; }
   .radius-all-apply { background: #2b6cdf; color: #fff; border-color: #2b6cdf !important; }
   .radius-all-apply:hover { background: #2057bd; }
 
   /* Zoom */
-  .map-zoom { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
+  .map-zoom { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
   .map-zoom-btn { width: 34px; height: 34px; background: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); cursor: pointer; font-size: 18px; color: #4a5878; display: flex; align-items: center; justify-content: center; font-weight: 300; transition: background 0.12s; }
   .map-zoom-btn:hover { background: #f0f3f8; }
 
@@ -146,6 +147,19 @@
   .frame-popup { position: absolute; z-index: 650; background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; box-shadow: 0 4px 16px rgba(0,0,0,0.13); padding: 10px 13px 11px; pointer-events: none; transform: translate(-50%, calc(-100% - 14px)); white-space: nowrap; }
   .frame-popup-name { font-size: 13px; font-weight: 600; color: #1a2233; margin-bottom: 3px; }
   .frame-popup-addr { font-size: 11.5px; color: #9aa3b5; }
+
+  /* Frame detail modal */
+  .frame-modal-overlay { position: fixed; inset: 0; z-index: 900; display: none; }
+  .frame-modal-overlay.open { display: block; }
+  .frame-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 18px; box-shadow: 0 12px 48px rgba(0,0,0,0.18); padding: 26px 28px 24px; min-width: 340px; max-width: 480px; width: 90vw; z-index: 901; }
+  .frame-modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+  .frame-modal-title { font-size: 18px; font-weight: 700; color: #1a2233; flex: 1; }
+  .frame-modal-close { width: 28px; height: 28px; border: none; background: #f5f7fb; border-radius: 7px; cursor: pointer; font-size: 16px; color: #6b7a99; display: flex; align-items: center; justify-content: center; }
+  .frame-modal-close:hover { background: #e6ebf2; }
+  .frame-modal-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #f0f3f8; font-size: 14px; }
+  .frame-modal-row:last-child { border-bottom: none; }
+  .frame-modal-key { color: #6b7a99; font-weight: 400; flex-shrink: 0; }
+  .frame-modal-val { color: #1a2233; font-weight: 500; text-align: right; }
 
   /* Filter panel */
   .filter-overlay { position: fixed; inset: 0; background: rgba(30,35,50,0.35); z-index: 800; display: none; }
@@ -190,17 +204,16 @@
   .filter-apply:hover { background: #2057bd; }
 
   /* Time-of-day slider (Frames mode) */
-  .time-slider-wrap { position: absolute; bottom: 14px; right: 14px; z-index: 500; background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.10); border: 1px solid #e6ebf2; padding: 8px 14px 8px 12px; display: none; align-items: center; gap: 10px; min-width: 520px; }
-  .time-slider-wrap.visible { display: flex; }
-  .time-day-select { appearance: none; -webkit-appearance: none; padding: 5px 24px 5px 10px; border-radius: 7px; border: 1.5px solid #d2d8e3; font-size: 12px; font-weight: 500; color: #1a2233; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 8px center; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .time-slider-wrap { background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.10); border: 1px solid #e6ebf2; padding: 8px 14px 8px 12px; display: flex; align-items: center; gap: 10px; }
+  .time-day-select { appearance: none; -webkit-appearance: none; padding: 7px 28px 7px 12px; border-radius: 7px; border: 1.5px solid #d2d8e3; font-size: 14px; font-weight: 500; color: #1a2233; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .time-slider-track-wrap { flex: 1; position: relative; }
-  .time-labels { position: relative; height: 14px; margin-bottom: 4px; pointer-events: none; user-select: none; }
-  .time-labels span { position: absolute; font-size: 10px; color: #b0b9cc; white-space: nowrap; }
-  .time-track { position: relative; height: 16px; display: flex; align-items: center; cursor: pointer; }
-  .time-track-bar { position: absolute; left: 0; right: 0; height: 3px; background: #eaecf2; border-radius: 2px; }
-  .time-track-fill { position: absolute; left: 0; height: 3px; background: #2b6cdf; border-radius: 2px; }
-  .time-thumb { position: absolute; width: 12px; height: 12px; background: #2b6cdf; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(43,108,223,0.4); transform: translateX(-50%); cursor: grab; top: 50%; margin-top: -6px; }
-  .time-current { font-size: 12px; font-weight: 700; color: #2b6cdf; white-space: nowrap; flex-shrink: 0; min-width: 36px; text-align: right; letter-spacing: -0.2px; }
+  .time-labels { position: relative; height: 18px; margin-bottom: 4px; pointer-events: none; user-select: none; }
+  .time-labels span { position: absolute; font-size: 12px; color: #b0b9cc; white-space: nowrap; }
+  .time-track { position: relative; height: 24px; display: flex; align-items: center; cursor: pointer; }
+  .time-track-bar { position: absolute; left: 0; right: 0; height: 5px; background: #eaecf2; border-radius: 3px; }
+  .time-track-fill { position: absolute; left: 0; height: 5px; background: #2b6cdf; border-radius: 3px; }
+  .time-thumb { position: absolute; width: 18px; height: 18px; background: #2b6cdf; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.45); transform: translateX(-50%); cursor: grab; top: 50%; margin-top: -9px; }
+  .time-current { font-size: 15px; font-weight: 700; color: #2b6cdf; white-space: nowrap; flex-shrink: 0; min-width: 42px; text-align: right; letter-spacing: -0.2px; }
 
   /* POI popup — exact index1 stats panel styles */
   /* Custom POI float popup */
@@ -239,8 +252,8 @@
       <div class="page-switcher">
         <a href="index.html">Index 1</a>
         <a href="index2.html">Index 2</a>
-        <a href="index3.html" class="active">Index 3</a>
-        <a href="index4.html">Index 4</a>
+        <a href="index3.html">Index 3</a>
+        <a href="index4.html" class="active">Index 4</a>
       </div>
       <div class="topbar-right">
         <button class="icon-btn">
@@ -336,21 +349,35 @@
 
     <!-- Map section -->
     <div class="map-section">
-      <div class="map-toolbar">
-        <span class="map-toolbar-title">Map Overview</span>
-        <button class="filter-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-          Filters
-        </button>
-        <div class="pill-group">
-          <button class="pill active">POIs</button>
-          <button class="pill">Heatmaps</button>
-          <button class="pill">Postcodes</button>
-        </div>
-      </div>
-
       <div class="map-wrap">
         <div id="map"></div>
+
+        <div class="map-controls-block">
+          <button class="map-ctrl-btn" id="postcodesToggle">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Postcodes
+          </button>
+          <button class="map-ctrl-btn" id="heatmapToggle">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            Heatmap
+          </button>
+          <div style="display:flex;align-items:center;border-right:1px solid #e6ebf2;padding:0 18px;gap:7px;cursor:pointer;position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a5878" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 12 15 2 8.5"/><polyline points="2 15.5 12 22 22 15.5"/><polyline points="2 12 12 18.5 22 12"/></svg>
+            <select id="hexLevelSelect" style="appearance:none;-webkit-appearance:none;border:none;background:transparent;font-size:14px;font-weight:600;color:#4a5878;font-family:inherit;cursor:pointer;outline:none;padding-right:14px;">
+              <option value="">Hex Level</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+              <option value="5">Level 5</option>
+              <option value="6">Level 6</option>
+              <option value="7">Level 7</option>
+            </select>
+            <svg style="position:absolute;right:18px;pointer-events:none;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4a5878" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <button class="map-ctrl-btn" id="filterToggle" style="border-right:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Filters
+          </button>
+        </div>
 
         <!-- Legend -->
         <div class="map-legend">
@@ -358,8 +385,49 @@
           <div class="legend-labels"><span>0</span><span>50%</span><span>100%</span></div>
         </div>
 
-        <!-- Metrics card -->
-        <div class="map-metrics" id="mapMetrics"></div>
+        <!-- Bottom stack: metrics + time slider -->
+        <div class="map-bottom-stack">
+          <!-- Change Radius panel -->
+          <div class="radius-all-panel" id="radiusAllPanel">
+            <div class="radius-all-header">
+              <span class="radius-all-title">Change Radius</span>
+              <button class="radius-all-close" id="radiusAllClose">×</button>
+            </div>
+            <div class="radius-all-apply-all">
+              <input type="number" id="radiusApplyAllInput" placeholder="Set all radii (m)" min="50" max="800" step="10" />
+              <button id="radiusApplyAllBtn">Apply To All</button>
+            </div>
+            <div class="radius-all-list" id="radiusAllList"></div>
+            <div class="radius-all-footer">
+              <button class="radius-all-cancel" id="radiusAllCancel">Cancel</button>
+              <button class="radius-all-apply" id="radiusAllApply">Set Radius</button>
+            </div>
+          </div>
+          <div class="map-metrics" id="mapMetrics"></div>
+          <div class="time-slider-wrap" id="timeSliderWrap">
+            <select class="time-day-select" id="timeDaySelect">
+              <option>Set day</option>
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+              <option>Sunday</option>
+            </select>
+            <div class="time-slider-track-wrap">
+              <div class="time-labels">
+                <span>12AM</span><span>2AM</span><span>4AM</span><span>6AM</span><span>8AM</span><span>10AM</span><span>12PM</span><span>2PM</span><span>4PM</span><span>6PM</span><span>8PM</span><span>10PM</span><span>12AM</span>
+              </div>
+              <div class="time-track" id="timeTrack">
+                <div class="time-track-bar"></div>
+                <div class="time-track-fill" id="timeTrackFill"></div>
+                <div class="time-thumb" id="timeThumb"></div>
+              </div>
+            </div>
+            <div class="time-current" id="timeCurrent">9AM</div>
+          </div>
+        </div>
 
         <!-- Zoom -->
         <div class="map-zoom">
@@ -369,50 +437,20 @@
 
         <!-- Custom POI popup -->
         <div id="poiPopup" class="poi-float" style="display:none"></div>
-        <!-- Frame popup -->
-        <div id="framePopup" class="frame-popup" style="display:none"></div>
 
-        <!-- All-segments radius panel -->
-        <div class="radius-all-panel" id="radiusAllPanel">
-          <div class="radius-all-header">
-            <span class="radius-all-title">Change Radius</span>
-            <button class="radius-all-close" id="radiusAllClose">×</button>
-          </div>
-          <div class="radius-all-apply-all">
-            <input type="number" id="radiusApplyAllInput" placeholder="Set all radii (m)" min="50" max="800" step="10" />
-            <button id="radiusApplyAllBtn">Apply To All</button>
-          </div>
-          <div class="radius-all-list" id="radiusAllList"></div>
-          <div class="radius-all-footer">
-            <button class="radius-all-cancel" id="radiusAllCancel">Cancel</button>
-            <button class="radius-all-apply" id="radiusAllApply">Set Radius</button>
+        <!-- Frame detail modal -->
+        <div class="frame-modal-overlay" id="frameModalOverlay">
+          <div class="frame-modal" id="frameModal">
+            <div class="frame-modal-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <span class="frame-modal-title" id="frameModalTitle"></span>
+              <button class="frame-modal-close" id="frameModalClose">×</button>
+            </div>
+            <div id="frameModalBody"></div>
           </div>
         </div>
 
         <!-- Time-of-day slider (Frames mode) -->
-        <div class="time-slider-wrap" id="timeSliderWrap">
-          <select class="time-day-select" id="timeDaySelect">
-            <option>Set day</option>
-            <option>Monday</option>
-            <option>Tuesday</option>
-            <option>Wednesday</option>
-            <option>Thursday</option>
-            <option>Friday</option>
-            <option>Saturday</option>
-            <option>Sunday</option>
-          </select>
-          <div class="time-slider-track-wrap">
-            <div class="time-labels">
-              <span>12AM</span><span>2AM</span><span>4AM</span><span>6AM</span><span>8AM</span><span>10AM</span><span>12PM</span><span>2PM</span><span>4PM</span><span>6PM</span><span>8PM</span><span>10PM</span><span>12AM</span>
-            </div>
-            <div class="time-track" id="timeTrack">
-              <div class="time-track-bar"></div>
-              <div class="time-track-fill" id="timeTrackFill"></div>
-              <div class="time-thumb" id="timeThumb"></div>
-            </div>
-          </div>
-          <div class="time-current" id="timeCurrent">9AM</div>
-        </div>
       </div>
     </div>
 
@@ -615,6 +653,9 @@ const map = L.map("map", {
   zoom: 13,
   zoomControl: false,
   attributionControl: false,
+  scrollWheelZoom: true,
+  touchZoom: true,
+  doubleClickZoom: true,
 });
 L.control.attribution({ position: "bottomright", prefix: false }).addTo(map);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
@@ -744,15 +785,17 @@ function renderMetrics() {
   card.innerHTML = `
     <div class="metrics-segments">${rows}</div>
     <div class="metrics-divider"></div>
-    <div class="metrics-totals">
-      Audience Size <span class="metrics-total-val">${(totalAud/1000).toFixed(1)}m</span>
-      <span class="metrics-total-sep">|</span>
-      Approx. Frames <span class="metrics-total-val">${(totalFrames/1000).toFixed(1)}k</span>
-    </div>
-    <button class="metrics-radius-btn" id="metricsRadiusBtn">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      Change Radius
-    </button>`;
+    <div class="metrics-footer">
+      <div class="metrics-totals">
+        Audience <span class="metrics-total-val">${(totalAud/1000).toFixed(1)}m</span>
+        <span class="metrics-total-sep">|</span>
+        Frames <span class="metrics-total-val">${(totalFrames/1000).toFixed(1)}k</span>
+      </div>
+      <button class="metrics-radius-btn" id="metricsRadiusBtn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Change Radius
+      </button>
+    </div>`;
   if (!document.getElementById("radiusAllPanel").classList.contains("visible")) {
     card.classList.add("visible");
   }
@@ -761,8 +804,13 @@ function renderMetrics() {
 
 document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
 document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut());
-map.on("click", () => { document.getElementById("poiPopup").style.display = "none"; document.getElementById("framePopup").style.display = "none"; });
-map.on("movestart", () => { document.getElementById("poiPopup").style.display = "none"; document.getElementById("framePopup").style.display = "none"; });
+
+function closeFrameModal() { document.getElementById("frameModalOverlay").classList.remove("open"); }
+document.getElementById("frameModalClose").addEventListener("click", closeFrameModal);
+document.getElementById("frameModalOverlay").addEventListener("click", function(e) { if (e.target === this) closeFrameModal(); });
+
+map.on("click", () => { document.getElementById("poiPopup").style.display = "none"; closeFrameModal(); });
+map.on("movestart", () => { document.getElementById("poiPopup").style.display = "none"; closeFrameModal(); });
 
 /* ------------ Heatmap ------------ */
 function renderHeatmap() {
@@ -855,7 +903,6 @@ function renderFrames() {
     ["Adobe Books","3166 16th St, San Francisco, CA 94103"],
   ];
 
-  const framePopup = document.getElementById("framePopup");
   let frameIdx = 0;
 
   const pts = getAllPOIPoints();
@@ -882,11 +929,24 @@ function renderFrames() {
         marker.on("click", (e) => {
           L.DomEvent.stopPropagation(e);
           document.getElementById("poiPopup").style.display = "none";
-          const pt = map.latLngToContainerPoint([fLat, fLng]);
-          framePopup.innerHTML = `<div class="frame-popup-name">${name}</div><div class="frame-popup-addr">${addr}</div>`;
-          framePopup.style.left = pt.x + "px";
-          framePopup.style.top  = pt.y + "px";
-          framePopup.style.display = "block";
+          // Build frame detail modal
+          const owners = ["Octopus","Lamar","Clear Channel","oOh!media","JCDecaux","Outfront","Vistar"];
+          const envs = ["Transit > Taxi & Rideshare TV > Other","Street Furniture > Bus Shelter","Retail > Shopping Mall","Roadside > Billboard","Transit > Rail Station"];
+          const formats = ["1280×720","1920×1080","1024×768","3840×2160","960×540"];
+          const types = ["Digital","Static","Interactive"];
+          const seed = frameIdx % 100;
+          const frameId = 170000 + (frameIdx * 37) % 9999;
+          document.getElementById("frameModalTitle").textContent = String(frameId);
+          document.getElementById("frameModalBody").innerHTML = [
+            ["Media Owner", owners[seed % owners.length]],
+            ["Environment", envs[seed % envs.length]],
+            ["Format", formats[seed % formats.length]],
+            ["Type", types[seed % types.length]],
+            ["ID", frameId],
+            ["Coordinates", `${fLat.toFixed(5)}, ${fLng.toFixed(5)}`],
+            ["Target audience", (85 + (seed % 15)).toFixed(2) + "%"],
+          ].map(([k,v]) => `<div class="frame-modal-row"><span class="frame-modal-key">${k}:</span><span class="frame-modal-val">${v}</span></div>`).join("");
+          document.getElementById("frameModalOverlay").classList.add("open");
         });
         clusterGroup.addLayer(marker);
       });
@@ -998,39 +1058,41 @@ function clearCluster() {
   if (clusterGroup) { map.removeLayer(clusterGroup); clusterGroup = null; }
 }
 
-// Pill toggle
-document.querySelectorAll(".pill").forEach(p => {
-  p.addEventListener("click", () => {
-    document.querySelectorAll(".pill").forEach(x => x.classList.remove("active"));
-    p.classList.add("active");
-    const label = p.textContent.trim();
-    const metrics = document.getElementById("mapMetrics");
-    if (label === "Heatmaps") {
-      activeMode = "heatmap";
-      clearCluster();
-      renderHeatmap();
-      metrics.classList.remove("visible");
-    } else if (label === "Postcodes") {
-      activeMode = "postcodes";
-      clearCluster();
-      renderPostcodes();
-      renderFrames();
-      metrics.classList.remove("visible");
-    } else {
-      activeMode = "pois";
-      clearCluster();
-      circleLayer.clearLayers();
-      renderMap();
-      renderFrames();
-      if (segments.length) renderMetrics(); else metrics.classList.remove("visible");
-    }
-  });
+// POIs always on; heatmap + postcodes are independent toggles
+activeMode = "pois";
+renderMap();
+renderFrames();
+
+let heatmapOn = false;
+let postcodesOn = false;
+
+document.getElementById("heatmapToggle").addEventListener("click", function() {
+  heatmapOn = !heatmapOn;
+  this.classList.toggle("active", heatmapOn);
+  if (heatmapOn) {
+    renderHeatmap();
+  } else {
+    circleLayer.clearLayers();
+    clearCluster();
+    renderMap();
+    renderFrames();
+  }
 });
 
-map.on("zoomend", () => {
-  if (activeMode === "pois") { renderMap(); renderFrames(); }
-  else if (activeMode === "postcodes") { renderPostcodes(); renderFrames(); }
+document.getElementById("postcodesToggle").addEventListener("click", function() {
+  postcodesOn = !postcodesOn;
+  this.classList.toggle("active", postcodesOn);
+  if (postcodesOn) {
+    renderPostcodes();
+  } else {
+    circleLayer.clearLayers();
+    clearCluster();
+    renderMap();
+    renderFrames();
+  }
 });
+
+map.on("zoomend", () => { renderMap(); renderFrames(); });
 
 setTimeout(() => { map.invalidateSize(); renderMap(); renderFrames(); renderMetrics(); }, 100);
 window.addEventListener("resize", () => map.invalidateSize());
@@ -1045,7 +1107,7 @@ function closeFilter() {
   document.getElementById("filterPanel").classList.remove("open");
 }
 
-document.querySelector(".filter-btn").addEventListener("click", openFilter);
+document.getElementById("filterToggle").addEventListener("click", openFilter);
 document.getElementById("filterOverlay").addEventListener("click", closeFilter);
 document.getElementById("filterCancel").addEventListener("click", closeFilter);
 document.getElementById("filterClose").addEventListener("click", closeFilter);

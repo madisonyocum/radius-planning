@@ -61,7 +61,7 @@
   .tab.active { color: #2b6cdf; border-bottom-color: #2b6cdf; }
 
   /* Main layout */
-  .main { display: grid; grid-template-columns: 320px 1fr var(--stats-width, 280px); gap: 10px; padding: 10px; flex: 1; min-height: 0; }
+  .main { display: grid; grid-template-columns: 320px 1fr var(--stats-width, 360px); gap: 10px; padding: 10px; flex: 1; min-height: 0; }
 
   /* Stats panel resize handle on left edge */
   .stats { position: relative; }
@@ -131,7 +131,7 @@
 
   /* Zoom controls */
   .map-zoom { position: absolute; bottom: 14px; right: 14px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
-  .map-zoom-btn { width: 34px; height: 34px; background: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); cursor: pointer; font-size: 18px; color: #4a5878; display: flex; align-items: center; justify-content: center; font-weight: 300; transition: background 0.12s, color 0.12s; }
+  .map-zoom-btn { width: 34px; height: 30px; background: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); cursor: pointer; font-size: 18px; color: #4a5878; display: flex; align-items: center; justify-content: center; font-weight: 300; transition: background 0.12s, color 0.12s; }
   .map-zoom-btn:hover { background: #f0f3f8; color: #1a2233; }
   .map-tooltip { position: absolute; background: #fff; border-radius: 14px; padding: 16px 18px 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); display: none; z-index: 600; pointer-events: auto; transform: translate(-50%, calc(-100% - 16px)); min-width: 240px; }
   .map-tooltip.visible { display: block; }
@@ -156,7 +156,7 @@
   .radius-editor-body { margin-bottom: 28px; }
   .radius-editor-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
   .radius-editor-row label { font-size: 14.5px; color: #6b7a99; }
-  .radius-editor-row .radius-val { font-size: 18px; font-weight: 600; color: #1a2233; }
+  .radius-editor-row .radius-val { font-size: 16px; font-weight: 600; color: #1a2233; }
   .radius-slider { width: 100%; margin: 12px 0; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: #e6ebf2; outline: none; cursor: pointer; display: block; }
   .radius-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(43,108,223,0.40); cursor: pointer; transition: transform 0.1s; margin-top: -8.5px; }
   .radius-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
@@ -179,8 +179,26 @@
   .stats-segment { padding: 18px 22px 20px; }
   .stats-segment-header { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; font-weight: 500; font-size: 15.5px; color: #1a2233; }
   .stats-segment-name { flex: 1; }
-  .stats-radius-btn { margin-left: auto; padding: 0; border: none; background: transparent; font-size: 13px; font-weight: 500; color: #6b7a99; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
-  .stats-radius-btn:hover { color: #1a2233; }
+  .stats-panel-title { font-size: 18px; font-weight: 700; color: #1a2233; padding: 20px 22px 0; letter-spacing: -0.2px; }
+  .stats-set-all { display: flex; gap: 8px; align-items: center; padding: 10px 22px 14px; border-bottom: 1px solid #e6ebf2; }
+  .stats-set-all input { flex: 1; height: 30px; padding: 0 10px; border: 1.5px solid #d2d8e3; border-radius: 7px; font-size: 13px; font-weight: 500; color: #1a2233; outline: none; }
+  .stats-set-all input:focus { border-color: #2b6cdf; }
+  .stats-set-all input::placeholder { color: #9aa3b5; }
+  .stats-set-all button { height: 30px; padding: 0 14px; border-radius: 7px; border: 1.5px solid #2b6cdf; background: #fff; color: #2b6cdf; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .stats-set-all button:hover { background: #f0f5ff; }
+  .inline-radius-wrap { margin-top: 14px; }
+  .inline-radius-row { display: flex; align-items: center; gap: 8px; }
+  .inline-radius-row .inline-radius-slider { flex: 1; }
+  .inline-radius-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+  .inline-radius-label { font-size: 12px; color: #9aa3b5; font-weight: 500; }
+  .inline-radius-val { font-size: 16px; font-weight: 600; color: #1a2233; }
+  .inline-radius-input { width: 62px; height: 30px; padding: 0 8px; border: 1.5px solid #d2d8e3; border-radius: 7px; font-size: 13px; font-weight: 500; color: #1a2233; text-align: center; outline: none; background: #fff; }
+  .inline-radius-input:focus { border-color: #2b6cdf; }
+  .inline-radius-input::-webkit-outer-spin-button, .inline-radius-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .inline-radius-input[type=number] { -moz-appearance: textfield; }
+  .inline-radius-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: #e6ebf2; outline: none; cursor: pointer; display: block; }
+  .inline-radius-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
+  .inline-radius-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.35); cursor: pointer; }
   .stats-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat-card { background: #f5f7fb; border-radius: 10px; border: none; padding: 10px 13px 12px; }
@@ -240,7 +258,8 @@
     <div style="display:flex;align-items:center;gap:2px;background:#f0f3f8;border-radius:8px;padding:3px;">
       <a href="index.html" style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;background:#fff;color:#1a2233;box-shadow:0 1px 3px rgba(0,0,0,0.10);">Index 1</a>
       <a href="index2.html" style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;color:#6b7a99;">Index 2</a>
-      <a href="index3.html" style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;color:#6b7a99;">Campaign Tactics</a>
+      <a href="index3.html" style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;color:#6b7a99;">Index 3</a>
+      <a href="index4.html" style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;color:#6b7a99;">Index 4</a>
     </div>
     <div class="topbar-right">
       <button class="icon-btn" aria-label="More">
@@ -1078,6 +1097,32 @@ function renderStats() {
     return;
   }
 
+  // Title + apply-all row
+  const titleEl = document.createElement("div");
+  titleEl.className = "stats-panel-title";
+  titleEl.textContent = "Segments Overview";
+  panel.appendChild(titleEl);
+
+  const setAllRow = document.createElement("div");
+  setAllRow.className = "stats-set-all";
+  setAllRow.innerHTML = `<input type="number" id="setAllRadiusInput" placeholder="Radius (m)" min="50" max="800" step="1" /><button id="setAllRadiusBtn">Apply To All</button>`;
+  panel.appendChild(setAllRow);
+
+  setAllRow.querySelector("#setAllRadiusBtn").addEventListener("click", () => {
+    let r = parseInt(setAllRow.querySelector("#setAllRadiusInput").value);
+    if (!r || r < 50) return;
+    r = Math.max(50, Math.min(800, r));
+    state.selectionOrder.forEach(sid => {
+      const b = defaultRadiusForSegment(sid);
+      segmentRadiusScale[sid] = r / b;
+      const slider = document.getElementById(`inlineRadiusSlider_${sid}`);
+      const numInput = document.getElementById(`inlineRadiusInput_${sid}`);
+      if (slider) { slider.value = r; const p = ((r-50)/750)*100; slider.style.background = `linear-gradient(to right,#2b6cdf ${p}%,#e6ebf2 ${p}%)`; }
+      if (numInput) numInput.value = r;
+    });
+    renderMap();
+  });
+
   state.selectionOrder.forEach(id => {
     const pois = segmentPOIs[id] || [];
     const color = colorForSegment(id);
@@ -1094,13 +1139,16 @@ function renderStats() {
     const audVal = pois.length ? (audSum / 1000).toFixed(1) + "m" : "—";
     const framesVal = pois.length ? (framesSum / 1000).toFixed(1) + "k" : "—";
 
+    const base = defaultRadiusForSegment(id);
+    const currentR = Math.round(base * (segmentRadiusScale[id] || 1.0));
+    const sliderPct = ((currentR - 50) / 750) * 100;
+
     const sec = document.createElement("div");
     sec.className = "stats-segment";
     sec.innerHTML = `
       <div class="stats-segment-header">
         <span class="stats-dot" style="background:${color.fill}"></span>
         <span class="stats-segment-name">${label}</span>
-        <button class="stats-radius-btn" data-id="${id}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><circle cx="9" cy="8" r="2.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="2.5" fill="currentColor" stroke="none"/></svg>Change Radius</button>
       </div>
       <div class="stat-grid">
         <div class="stat-card">
@@ -1111,8 +1159,41 @@ function renderStats() {
           <div class="stat-label">Approx. Frames</div>
           <div class="stat-value">${framesVal}</div>
         </div>
+      </div>
+      <div class="inline-radius-wrap">
+        <div class="inline-radius-header">
+          <span class="inline-radius-label">Radius</span>
+        </div>
+        <div class="inline-radius-row">
+          <input type="range" class="inline-radius-slider" id="inlineRadiusSlider_${id}"
+            min="50" max="800" step="10" value="${currentR}"
+            style="background:linear-gradient(to right,#2b6cdf ${sliderPct}%,#e6ebf2 ${sliderPct}%)" />
+          <input type="number" class="inline-radius-input" id="inlineRadiusInput_${id}" value="${currentR}" min="50" max="800" step="1" />
+        </div>
       </div>`;
-    sec.querySelector(".stats-radius-btn").addEventListener("click", () => openRadiusEditorCentered(id));
+
+    const slider = sec.querySelector(`#inlineRadiusSlider_${id}`);
+    const numInput = sec.querySelector(`#inlineRadiusInput_${id}`);
+
+    slider.addEventListener("input", function() {
+      const r = parseInt(this.value);
+      numInput.value = r;
+      const p = ((r - 50) / 750) * 100;
+      this.style.background = `linear-gradient(to right,#2b6cdf ${p}%,#e6ebf2 ${p}%)`;
+      segmentRadiusScale[id] = r / base;
+      renderMap();
+    });
+
+    numInput.addEventListener("change", function() {
+      let r = Math.max(50, Math.min(800, parseInt(this.value) || 50));
+      this.value = r;
+      slider.value = r;
+      const p = ((r - 50) / 750) * 100;
+      slider.style.background = `linear-gradient(to right,#2b6cdf ${p}%,#e6ebf2 ${p}%)`;
+      segmentRadiusScale[id] = r / base;
+      renderMap();
+    });
+
     panel.appendChild(sec);
   });
 }
@@ -1208,7 +1289,7 @@ mapPanel.addEventListener("drop", (e) => {
   resizer.addEventListener("mousedown", (e) => {
     e.preventDefault();
     startX = e.clientX;
-    startW = parseInt(getComputedStyle(mainEl).getPropertyValue("--stats-width") || "280", 10);
+    startW = parseInt(getComputedStyle(mainEl).getPropertyValue("--stats-width") || "340", 10);
     resizer.classList.add("dragging");
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
