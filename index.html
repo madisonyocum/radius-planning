@@ -61,7 +61,8 @@
   .tab.active { color: #2b6cdf; border-bottom-color: #2b6cdf; }
 
   /* Main layout */
-  .main { display: grid; grid-template-columns: 320px 1fr var(--stats-width, 360px); gap: 10px; padding: 10px; flex: 1; min-height: 0; }
+  .main { display: grid; grid-template-columns: 360px 1fr var(--stats-width, 360px); gap: 10px; padding: 10px; flex: 1; min-height: 0; }
+  .main.no-segments { grid-template-columns: 360px 1fr; }
 
   /* Stats panel resize handle on left edge */
   .stats { position: relative; }
@@ -181,9 +182,12 @@
 
   /* Right panel */
   .stats { display: flex; flex-direction: column; gap: 0; overflow-y: auto; background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; }
-  .stats-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 18px; padding: 24px; text-align: center; }
-  .stats-empty img { width: 130px; height: 130px; object-fit: contain; }
-  .stats-empty p { margin: 0; color: #7a8499; font-size: 14px; font-weight: 400; }
+  .stats-empty { display: none; }
+
+  /* Floating empty-state hint over the map */
+  .map-empty-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 20px; box-shadow: 0 8px 36px rgba(0,0,0,0.13); padding: 36px 44px 32px; display: flex; flex-direction: column; align-items: center; gap: 18px; z-index: 500; pointer-events: none; text-align: center; min-width: 280px; }
+  .map-empty-hint.hidden { display: none; }
+  .map-empty-hint p { margin: 0; color: #6b7a99; font-size: 14px; font-weight: 500; line-height: 1.5; }
   .stats-segment { padding: 18px 22px 20px; }
   .stats-segment-header { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; font-weight: 500; font-size: 15.5px; color: #1a2233; }
   .stats-segment-name { flex: 1; }
@@ -352,6 +356,20 @@
     <!-- Map -->
     <div class="panel map-panel">
       <div id="map"></div>
+      <div class="map-empty-hint" id="mapEmptyHint">
+        <svg width="100" height="80" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="12" width="80" height="56" rx="10" fill="#eef2fc"/>
+          <rect x="22" y="24" width="42" height="7" rx="3.5" fill="#c3d0f5"/>
+          <rect x="22" y="36" width="30" height="7" rx="3.5" fill="#c3d0f5"/>
+          <rect x="22" y="48" width="36" height="7" rx="3.5" fill="#c3d0f5"/>
+          <circle cx="72" cy="27.5" r="6" fill="#2b6cdf" opacity="0.18"/>
+          <circle cx="72" cy="39.5" r="6" fill="#2b6cdf" opacity="0.18"/>
+          <circle cx="72" cy="51.5" r="6" fill="#2b6cdf" opacity="0.18"/>
+          <circle cx="72" cy="27.5" r="3" fill="#2b6cdf"/>
+          <circle cx="72" cy="51.5" r="3" fill="#2b6cdf"/>
+        </svg>
+        <p>Click or drag to add segments</p>
+      </div>
       <div class="map-drop-hint" id="mapDropHint">Drop to add segment</div>
       <div class="map-tooltip" id="mapTooltip"></div>
       <div class="radius-editor" id="radiusEditor">
@@ -1106,16 +1124,21 @@ function cancelRadiusEditor() {
 /* ------------ Stats ------------ */
 function renderStats() {
   const panel = document.getElementById("statsPanel");
+  const mainEl = document.querySelector(".main");
+  const hint = document.getElementById("mapEmptyHint");
   // Clear everything except the resizer handle
   Array.from(panel.children).forEach(c => { if (c.id !== "statsResizer") c.remove(); });
 
   if (state.selectionOrder.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "stats-empty";
-    empty.innerHTML = `<img src="segments.png" alt="" /><p>Drag segments into the map</p>`;
-    panel.appendChild(empty);
+    mainEl.classList.add("no-segments");
+    panel.style.display = "none";
+    if (hint) hint.classList.remove("hidden");
     return;
   }
+
+  mainEl.classList.remove("no-segments");
+  panel.style.display = "";
+  if (hint) hint.classList.add("hidden");
 
   // Title + apply-all row
   const titleEl = document.createElement("div");
