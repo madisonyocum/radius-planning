@@ -204,13 +204,18 @@
 
   /* POI popup — exact index1 stats panel styles */
   /* Custom POI float popup */
-  .poi-float { position: absolute; z-index: 600; background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; box-shadow: 0 6px 24px rgba(0,0,0,0.14); padding: 10px 12px 11px; pointer-events: none; transform: translate(-50%, calc(-100% - 14px)); }
-  .poi-float-header { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; font-size: 13px; font-weight: 500; color: #1a2233; white-space: nowrap; }
-  .poi-float-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .poi-float-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-  .poi-float-card { background: #f5f7fb; border-radius: 8px; padding: 6px 9px 7px; }
-  .poi-float-label { font-size: 10.5px; color: #9aa3b5; margin-bottom: 2px; white-space: nowrap; }
-  .poi-float-val { font-size: 15px; font-weight: 500; color: #1a2233; }
+  .map-tooltip { position: absolute; background: #fff; border-radius: 14px; padding: 16px 18px 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); display: none; z-index: 600; pointer-events: auto; transform: translate(-50%, calc(-100% - 16px)); min-width: 240px; }
+  .map-tooltip.visible { display: block; }
+  .map-tooltip-header { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 16px; color: #1a2233; margin-bottom: 12px; }
+  .map-tooltip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .map-tooltip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .map-tooltip-card { background: #f5f7fb; border-radius: 10px; padding: 10px 13px; }
+  .map-tooltip-label { font-size: 11.5px; color: #9aa3b5; margin-bottom: 3px; }
+  .map-tooltip-value { font-size: 19px; font-weight: 500; color: #1a2233; }
+  .map-tooltip-btn { width: 100%; padding: 8px 0; border-radius: 8px; border: 1px solid #e6ebf2; background: #fff; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.12s, border-color 0.12s; }
+  .map-tooltip-btn:hover { background: #f5f7fb; border-color: #c8d0e0; color: #1a2233; }
+  .tooltip-remove-btn { width:32px;height:32px;border:none;background:#f5f7fb;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9aa3b5;flex-shrink:0;transition:background 0.12s,color 0.12s; }
+  .tooltip-remove-btn:hover { background:#fdecea;color:#d83a52; }
 
 </style>
 </head>
@@ -368,7 +373,7 @@
         </div>
 
         <!-- Custom POI popup -->
-        <div id="poiPopup" class="poi-float" style="display:none"></div>
+        <div class="map-tooltip" id="mapTooltip"></div>
         <!-- Frame popup -->
         <div id="framePopup" class="frame-popup" style="display:none"></div>
 
@@ -677,7 +682,7 @@ function renderMap() {
       // (CSS pointer-events:none on the pane div is not inherited by SVG children)
       const radiusCircle = L.circle([cluster.lat, cluster.lng], {
         radius: r,
-        color: stroke, weight: 3, opacity: 0.85,
+        color: stroke, weight: 1, opacity: 0.85,
         fillColor: fill, fillOpacity: 0.08 + cluster.intensity * 0.12,
         bubblingMouseEvents: false,
         interactive: false,
@@ -693,27 +698,7 @@ function renderMap() {
       });
       clickTarget.on('click', (e) => {
         L.DomEvent.stopPropagation(e);
-        const { aud, fr } = segmentMetrics(id);
-        const pt = map.latLngToContainerPoint([cluster.lat, cluster.lng]);
-        const popup = document.getElementById('poiPopup');
-        popup.innerHTML = `
-          <div class="poi-float-header">
-            <span class="poi-float-dot" style="background:${fill}"></span>
-            <span>${label}</span>
-          </div>
-          <div class="poi-float-grid">
-            <div class="poi-float-card">
-              <div class="poi-float-label">Audience Size</div>
-              <div class="poi-float-val">${(aud/1000).toFixed(1)}m</div>
-            </div>
-            <div class="poi-float-card">
-              <div class="poi-float-label">Approx. Frames</div>
-              <div class="poi-float-val">${(fr/1000).toFixed(1)}k</div>
-            </div>
-          </div>`;
-        popup.style.left = pt.x + 'px';
-        popup.style.top  = pt.y + 'px';
-        popup.style.display = 'block';
+        showTooltip(e, id, cluster);
       });
       clickTarget.addTo(circleLayer);
     });
@@ -761,8 +746,53 @@ function renderMetrics() {
 
 document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
 document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut());
-map.on("click", () => { document.getElementById("poiPopup").style.display = "none"; document.getElementById("framePopup").style.display = "none"; });
-map.on("movestart", () => { document.getElementById("poiPopup").style.display = "none"; document.getElementById("framePopup").style.display = "none"; });
+const tooltipEl = document.getElementById("mapTooltip");
+
+function hideTooltip() { tooltipEl.classList.remove("visible"); }
+
+function showTooltip(e, id, cluster) {
+  L.DomEvent.stopPropagation(e);
+  const seg = segments.find(s => s.id === id);
+  const label = seg ? seg.label : id;
+  const color = colorForSegment(id);
+  const { aud, fr } = segmentMetrics(id);
+  const audVal = (aud/1000).toFixed(1) + "m";
+  const frVal  = (fr/1000).toFixed(1) + "k";
+
+  tooltipEl.innerHTML = `
+    <div class="map-tooltip-header">
+      <span class="map-tooltip-dot" style="background:${color.fill}"></span>
+      <span style="flex:1">${label}</span>
+      <button id="tooltipRemoveBtn" class="tooltip-remove-btn" title="Remove segment">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+    <div class="map-tooltip-grid">
+      <div class="map-tooltip-card"><div class="map-tooltip-label">Audience Size</div><div class="map-tooltip-value">${audVal}</div></div>
+      <div class="map-tooltip-card"><div class="map-tooltip-label">Approx. Frames</div><div class="map-tooltip-value">${frVal}</div></div>
+    </div>
+    <button class="map-tooltip-btn" id="tooltipRadiusBtn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><circle cx="9" cy="8" r="2.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="2.5" fill="currentColor" stroke="none"/></svg>
+      Change Radius
+    </button>`;
+
+  document.getElementById("tooltipRadiusBtn").addEventListener("click", ev => {
+    ev.stopPropagation(); hideTooltip(); openRadiusAllPanel();
+  });
+  document.getElementById("tooltipRemoveBtn").addEventListener("click", ev => {
+    ev.stopPropagation(); hideTooltip();
+    segments = segments.filter(s => s.id !== id);
+    renderMap(); renderFrames(); renderMetrics();
+  });
+
+  const pt = map.latLngToContainerPoint([cluster.lat, cluster.lng]);
+  tooltipEl.style.left = pt.x + "px";
+  tooltipEl.style.top  = pt.y + "px";
+  tooltipEl.classList.add("visible");
+}
+
+map.on("click", () => { hideTooltip(); document.getElementById("framePopup").style.display = "none"; });
+map.on("movestart", () => { hideTooltip(); document.getElementById("framePopup").style.display = "none"; });
 
 /* ------------ Heatmap ------------ */
 function renderHeatmap() {
@@ -881,7 +911,7 @@ function renderFrames() {
         });
         marker.on("click", (e) => {
           L.DomEvent.stopPropagation(e);
-          document.getElementById("poiPopup").style.display = "none";
+          hideTooltip();
           const pt = map.latLngToContainerPoint([fLat, fLng]);
           framePopup.innerHTML = `<div class="frame-popup-name">${name}</div><div class="frame-popup-addr">${addr}</div>`;
           framePopup.style.left = pt.x + "px";

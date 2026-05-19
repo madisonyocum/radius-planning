@@ -85,20 +85,23 @@
   .legend-labels { display: flex; justify-content: space-between; font-size: 11px; color: #6b7a99; width: 140px; }
 
   /* Metrics card */
-  .map-bottom-stack { position: absolute; bottom: 14px; right: 14px; z-index: 500; display: flex; flex-direction: column; gap: 8px; min-width: 520px; }
-  .map-metrics { background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.13); padding: 18px 22px 14px; display: none; }
+  .map-bottom-stack { position: absolute; bottom: 14px; right: 14px; z-index: 500; display: flex; flex-direction: column; gap: 8px; width: 380px; }
+  .map-metrics { background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.11); padding: 18px 20px 16px; display: none; }
   .map-metrics.visible { display: block; }
-  .metrics-segments { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
-  .metrics-seg-row { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 500; color: #1a2233; }
-  .metrics-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .metrics-vals { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+  .metrics-segments { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .metrics-seg-row { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: #1a2233; }
+  .metrics-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .metrics-vals { margin-left: auto; display: flex; align-items: center; gap: 14px; }
   .metrics-val { font-size: 12px; color: #9aa3b5; display: flex; align-items: baseline; gap: 3px; }
   .metrics-val strong { color: #1a2233; font-weight: 600; font-size: 13px; }
-  .metrics-divider { height: 1px; background: #e6ebf2; margin-bottom: 12px; }
-  .metrics-footer { display: flex; align-items: center; }
-  .metrics-totals { display: flex; align-items: baseline; gap: 6px; font-size: 12px; color: #6b7a99; flex: 1; }
-  .metrics-total-val { font-size: 17px; font-weight: 700; color: #1a2233; }
-  .metrics-total-sep { margin: 0 12px; color: #d2d8e3; }
+  .metrics-divider { height: 1px; background: #f0f3f8; margin-bottom: 14px; }
+  .metrics-footer { display: flex; flex-direction: column; gap: 12px; }
+  .metrics-footer-row { display: flex; align-items: center; }
+  .metrics-radius-btn-full { width: 100%; padding: 9px 0; border-radius: 9px; border: 1.5px solid #e2e8f0; background: #f8f9fc; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.12s, border-color 0.12s; }
+  .metrics-radius-btn-full:hover { background: #eef1f7; border-color: #c8d0de; color: #1a2233; }
+  .metrics-totals { display: flex; align-items: baseline; gap: 6px; font-size: 12px; color: #8a94a8; flex: 1; }
+  .metrics-total-val { font-size: 15px; font-weight: 700; color: #1a2233; }
+  .metrics-total-sep { margin: 0 10px; color: #dde2ec; }
   .metrics-radius-btn { padding: 7px 16px; border-radius: 8px; border: 1px solid #d2d8e3; background: #fff; font-size: 13px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.12s; flex-shrink: 0; }
   .metrics-radius-btn:hover { background: #f5f7fb; color: #1a2233; }
 
@@ -137,12 +140,12 @@
   .leaflet-control-attribution { font-size: 10px; }
 
   /* Custom cluster icons */
-  .cluster-icon { border-radius: 50%; background: #2b6cdf; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: 0 2px 10px rgba(43,108,223,0.45); border: 2.5px solid rgba(255,255,255,0.8); }
+  .cluster-icon { border-radius: 50%; background: linear-gradient(145deg, #3d7ef5, #1e56c8); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: 0 2px 7px rgba(90,110,160,0.28); border: 1px solid #fff; }
   .cluster-sm  { width: 34px; height: 34px; font-size: 12px; }
   .cluster-md  { width: 44px; height: 44px; font-size: 13px; }
   .cluster-lg  { width: 54px; height: 54px; font-size: 14px; }
   .cluster-xl  { width: 64px; height: 64px; font-size: 15px; }
-  .marker-single { width: 20px; height: 20px; border-radius: 50%; background: #2b6cdf; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.55); cursor: pointer; }
+  .marker-single { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(145deg, #3d7ef5, #1e56c8); box-shadow: 0 2px 5px rgba(90,110,160,0.28); cursor: pointer; border: 1px solid #fff; }
   /* Frame popup */
   .frame-popup { position: absolute; z-index: 650; background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; box-shadow: 0 4px 16px rgba(0,0,0,0.13); padding: 10px 13px 11px; pointer-events: none; transform: translate(-50%, calc(-100% - 14px)); white-space: nowrap; }
   .frame-popup-name { font-size: 13px; font-weight: 600; color: #1a2233; margin-bottom: 3px; }
@@ -151,12 +154,12 @@
   /* Frame detail modal */
   .frame-modal-overlay { position: fixed; inset: 0; z-index: 900; display: none; }
   .frame-modal-overlay.open { display: block; }
-  .frame-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 18px; box-shadow: 0 12px 48px rgba(0,0,0,0.18); padding: 26px 28px 24px; min-width: 340px; max-width: 480px; width: 90vw; z-index: 901; }
-  .frame-modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
-  .frame-modal-title { font-size: 18px; font-weight: 700; color: #1a2233; flex: 1; }
-  .frame-modal-close { width: 28px; height: 28px; border: none; background: #f5f7fb; border-radius: 7px; cursor: pointer; font-size: 16px; color: #6b7a99; display: flex; align-items: center; justify-content: center; }
+  .frame-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.18); padding: 14px 16px 12px; min-width: 200px; max-width: 260px; width: 90vw; z-index: 901; }
+  .frame-modal-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .frame-modal-title { font-size: 13px; font-weight: 700; color: #1a2233; flex: 1; }
+  .frame-modal-close { width: 20px; height: 20px; border: none; background: #f5f7fb; border-radius: 5px; cursor: pointer; font-size: 12px; color: #6b7a99; display: flex; align-items: center; justify-content: center; }
   .frame-modal-close:hover { background: #e6ebf2; }
-  .frame-modal-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #f0f3f8; font-size: 14px; }
+  .frame-modal-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f0f3f8; font-size: 11px; }
   .frame-modal-row:last-child { border-bottom: none; }
   .frame-modal-key { color: #6b7a99; font-weight: 400; flex-shrink: 0; }
   .frame-modal-val { color: #1a2233; font-weight: 500; text-align: right; }
@@ -204,26 +207,31 @@
   .filter-apply:hover { background: #2057bd; }
 
   /* Time-of-day slider (Frames mode) */
-  .time-slider-wrap { background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.10); border: 1px solid #e6ebf2; padding: 8px 14px 8px 12px; display: flex; align-items: center; gap: 10px; }
-  .time-day-select { appearance: none; -webkit-appearance: none; padding: 7px 28px 7px 12px; border-radius: 7px; border: 1.5px solid #d2d8e3; font-size: 14px; font-weight: 500; color: #1a2233; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .time-slider-wrap { background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.11); padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .time-day-select { appearance: none; -webkit-appearance: none; padding: 7px 28px 7px 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; font-size: 13px; font-weight: 500; color: #1a2233; background: #f8f9fc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .time-slider-track-wrap { flex: 1; position: relative; }
-  .time-labels { position: relative; height: 18px; margin-bottom: 4px; pointer-events: none; user-select: none; }
-  .time-labels span { position: absolute; font-size: 12px; color: #b0b9cc; white-space: nowrap; }
-  .time-track { position: relative; height: 24px; display: flex; align-items: center; cursor: pointer; }
-  .time-track-bar { position: absolute; left: 0; right: 0; height: 5px; background: #eaecf2; border-radius: 3px; }
-  .time-track-fill { position: absolute; left: 0; height: 5px; background: #2b6cdf; border-radius: 3px; }
+  .time-labels { position: relative; height: 16px; margin-bottom: 6px; pointer-events: none; user-select: none; }
+  .time-labels span { position: absolute; font-size: 11px; color: #b0b9cc; white-space: nowrap; }
+  .time-track { position: relative; height: 22px; display: flex; align-items: center; cursor: pointer; }
+  .time-track-bar { position: absolute; left: 0; right: 0; height: 4px; background: #eaecf2; border-radius: 3px; }
+  .time-track-fill { position: absolute; left: 0; height: 4px; background: #2b6cdf; border-radius: 3px; }
   .time-thumb { position: absolute; width: 18px; height: 18px; background: #2b6cdf; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(43,108,223,0.45); transform: translateX(-50%); cursor: grab; top: 50%; margin-top: -9px; }
-  .time-current { font-size: 15px; font-weight: 700; color: #2b6cdf; white-space: nowrap; flex-shrink: 0; min-width: 42px; text-align: right; letter-spacing: -0.2px; }
+  .time-current { font-size: 14px; font-weight: 700; color: #2b6cdf; white-space: nowrap; flex-shrink: 0; min-width: 40px; text-align: right; letter-spacing: -0.2px; }
 
   /* POI popup — exact index1 stats panel styles */
   /* Custom POI float popup */
-  .poi-float { position: absolute; z-index: 600; background: #fff; border-radius: 10px; border: 1px solid #e6ebf2; box-shadow: 0 6px 24px rgba(0,0,0,0.14); padding: 10px 12px 11px; pointer-events: none; transform: translate(-50%, calc(-100% - 14px)); }
-  .poi-float-header { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; font-size: 13px; font-weight: 500; color: #1a2233; white-space: nowrap; }
-  .poi-float-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .poi-float-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-  .poi-float-card { background: #f5f7fb; border-radius: 8px; padding: 6px 9px 7px; }
-  .poi-float-label { font-size: 10.5px; color: #9aa3b5; margin-bottom: 2px; white-space: nowrap; }
-  .poi-float-val { font-size: 15px; font-weight: 500; color: #1a2233; }
+  .map-tooltip { position: absolute; background: #fff; border-radius: 13px; padding: 13px 13px 11px; box-shadow: 0 6px 22px rgba(0,0,0,0.16); display: none; z-index: 600; pointer-events: auto; transform: translate(-50%, calc(-100% - 13px)); min-width: 195px; }
+  .map-tooltip.visible { display: block; }
+  .map-tooltip-header { display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 12px; color: #1a2233; margin-bottom: 10px; }
+  .map-tooltip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .map-tooltip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .map-tooltip-card { background: #f5f7fb; border-radius: 8px; padding: 8px 10px; }
+  .map-tooltip-label { font-size: 10px; color: #9aa3b5; margin-bottom: 4px; font-weight: 400; }
+  .map-tooltip-value { font-size: 15px; font-weight: 700; color: #1a2233; }
+  .map-tooltip-btn { width: 100%; padding: 8px 0; border-radius: 7px; border: 1.5px solid #e6ebf2; background: #fff; font-size: 11px; font-weight: 500; color: #4a5878; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: background 0.12s, border-color 0.12s; }
+  .map-tooltip-btn:hover { background: #f5f7fb; border-color: #c8d0e0; color: #1a2233; }
+  .tooltip-remove-btn { width:24px;height:24px;border:none;background:#f5f7fb;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9aa3b5;flex-shrink:0;transition:background 0.12s,color 0.12s;margin-left:auto; }
+  .tooltip-remove-btn:hover { background:#fdecea;color:#d83a52; }
 
 </style>
 </head>
@@ -435,8 +443,7 @@
           <button class="map-zoom-btn" id="zoomOut">−</button>
         </div>
 
-        <!-- Custom POI popup -->
-        <div id="poiPopup" class="poi-float" style="display:none"></div>
+        <div class="map-tooltip" id="mapTooltip"></div>
 
         <!-- Frame detail modal -->
         <div class="frame-modal-overlay" id="frameModalOverlay">
@@ -663,10 +670,14 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
   maxZoom: 19,
 }).addTo(map);
 
-// Custom pane above markers (600) so circles render on top of cluster dots
+// circlesPane: visual circles, above markers, no pointer events
 map.createPane('circlesPane');
 map.getPane('circlesPane').style.zIndex = 620;
-map.getPane('circlesPane').style.pointerEvents = 'none'; // pass clicks through to clusters below
+map.getPane('circlesPane').style.pointerEvents = 'none';
+
+// hitPane: invisible click zones, just BELOW markers (600) so markers win on overlap
+map.createPane('hitPane');
+map.getPane('hitPane').style.zIndex = 590;
 
 const circleLayer = L.layerGroup().addTo(map);
 
@@ -718,7 +729,7 @@ function renderMap() {
       // (CSS pointer-events:none on the pane div is not inherited by SVG children)
       const radiusCircle = L.circle([cluster.lat, cluster.lng], {
         radius: r,
-        color: stroke, weight: 3, opacity: 0.85,
+        color: stroke, weight: 1, opacity: 0.85,
         fillColor: fill, fillOpacity: 0.08 + cluster.intensity * 0.12,
         bubblingMouseEvents: false,
         interactive: false,
@@ -727,36 +738,20 @@ function renderMap() {
       radiusCircle.addTo(circleLayer);
       if (radiusCircle._path) radiusCircle._path.style.pointerEvents = 'none';
 
-      // Invisible click target at circle center (in normal marker pane so events work)
-      const clickTarget = L.circleMarker([cluster.lat, cluster.lng], {
-        radius: 14, color: 'transparent', fillColor: 'transparent',
-        fillOpacity: 0, opacity: 0, bubblingMouseEvents: false,
+      // Hit zone in hitPane (z-index 590) — below markerPane (600) so POI dots still win,
+      // but captures any click in the circle area that doesn't land on a marker.
+      const hitZone = L.circle([cluster.lat, cluster.lng], {
+        radius: r,
+        color: 'transparent', weight: 12, opacity: 0.001,
+        fillColor: '#000', fillOpacity: 0.001,
+        bubblingMouseEvents: false, interactive: true,
+        pane: 'hitPane',
       });
-      clickTarget.on('click', (e) => {
+      hitZone.on('click', (e) => {
         L.DomEvent.stopPropagation(e);
-        const { aud, fr } = segmentMetrics(id);
-        const pt = map.latLngToContainerPoint([cluster.lat, cluster.lng]);
-        const popup = document.getElementById('poiPopup');
-        popup.innerHTML = `
-          <div class="poi-float-header">
-            <span class="poi-float-dot" style="background:${fill}"></span>
-            <span>${label}</span>
-          </div>
-          <div class="poi-float-grid">
-            <div class="poi-float-card">
-              <div class="poi-float-label">Audience Size</div>
-              <div class="poi-float-val">${(aud/1000).toFixed(1)}m</div>
-            </div>
-            <div class="poi-float-card">
-              <div class="poi-float-label">Approx. Frames</div>
-              <div class="poi-float-val">${(fr/1000).toFixed(1)}k</div>
-            </div>
-          </div>`;
-        popup.style.left = pt.x + 'px';
-        popup.style.top  = pt.y + 'px';
-        popup.style.display = 'block';
+        showTooltip(e, id, cluster);
       });
-      clickTarget.addTo(circleLayer);
+      hitZone.addTo(circleLayer);
     });
   });
 }
@@ -786,12 +781,14 @@ function renderMetrics() {
     <div class="metrics-segments">${rows}</div>
     <div class="metrics-divider"></div>
     <div class="metrics-footer">
-      <div class="metrics-totals">
-        Audience <span class="metrics-total-val">${(totalAud/1000).toFixed(1)}m</span>
-        <span class="metrics-total-sep">|</span>
-        Frames <span class="metrics-total-val">${(totalFrames/1000).toFixed(1)}k</span>
+      <div class="metrics-footer-row">
+        <div class="metrics-totals">
+          Audience <span class="metrics-total-val">${(totalAud/1000).toFixed(1)}m</span>
+          <span class="metrics-total-sep">|</span>
+          Frames <span class="metrics-total-val">${(totalFrames/1000).toFixed(1)}k</span>
+        </div>
       </div>
-      <button class="metrics-radius-btn" id="metricsRadiusBtn">
+      <button class="metrics-radius-btn-full" id="metricsRadiusBtn">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         Change Radius
       </button>
@@ -809,8 +806,59 @@ function closeFrameModal() { document.getElementById("frameModalOverlay").classL
 document.getElementById("frameModalClose").addEventListener("click", closeFrameModal);
 document.getElementById("frameModalOverlay").addEventListener("click", function(e) { if (e.target === this) closeFrameModal(); });
 
-map.on("click", () => { document.getElementById("poiPopup").style.display = "none"; closeFrameModal(); });
-map.on("movestart", () => { document.getElementById("poiPopup").style.display = "none"; closeFrameModal(); });
+const tooltipEl = document.getElementById("mapTooltip");
+
+function hideTooltip() { tooltipEl.classList.remove("visible"); }
+
+function positionTooltip(lat, lng) {
+  const pt = map.latLngToContainerPoint([lat, lng]);
+  tooltipEl.style.left = pt.x + "px";
+  tooltipEl.style.top  = pt.y + "px";
+}
+
+function showTooltip(e, id, cluster) {
+  L.DomEvent.stopPropagation(e);
+  closeFrameModal();
+  const seg = segments.find(s => s.id === id);
+  const label = seg ? seg.label : id;
+  const segIdx = segments.findIndex(s => s.id === id);
+  const { fill } = colorPalette[segIdx % colorPalette.length];
+  const { aud, fr } = segmentMetrics(id);
+  const audVal = (aud/1000).toFixed(1) + "m";
+  const frVal  = (fr/1000).toFixed(1) + "k";
+
+  tooltipEl.innerHTML = `
+    <div class="map-tooltip-header">
+      <span class="map-tooltip-dot" style="background:${fill}"></span>
+      <span style="flex:1">${label}</span>
+      <button id="tooltipRemoveBtn" class="tooltip-remove-btn" title="Remove segment">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+    <div class="map-tooltip-grid">
+      <div class="map-tooltip-card"><div class="map-tooltip-label">Audience Size</div><div class="map-tooltip-value">${audVal}</div></div>
+      <div class="map-tooltip-card"><div class="map-tooltip-label">Approx. Frames</div><div class="map-tooltip-value">${frVal}</div></div>
+    </div>
+    <button class="map-tooltip-btn" id="tooltipRadiusBtn">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><circle cx="9" cy="8" r="2.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="2.5" fill="currentColor" stroke="none"/></svg>
+      Change Radius
+    </button>`;
+
+  document.getElementById("tooltipRadiusBtn").addEventListener("click", ev => {
+    ev.stopPropagation(); hideTooltip(); openRadiusAllPanel();
+  });
+  document.getElementById("tooltipRemoveBtn").addEventListener("click", ev => {
+    ev.stopPropagation(); hideTooltip();
+    segments = segments.filter(s => s.id !== id);
+    renderMap(); renderFrames(); renderMetrics();
+  });
+
+  tooltipEl.classList.add("visible");
+  positionTooltip(cluster.lat, cluster.lng);
+}
+
+map.on("click", () => { hideTooltip(); closeFrameModal(); });
+map.on("movestart", () => { hideTooltip(); closeFrameModal(); });
 
 /* ------------ Heatmap ------------ */
 function renderHeatmap() {
@@ -911,24 +959,24 @@ function renderFrames() {
     const rand = seededRand(500 + i);
     // Main cluster + satellite sub-clusters spread across the radius
     const subCenters = [[lat, lng]];
-    const subCount = 4 + Math.floor(intensity * 3);
+    const subCount = 1 + Math.floor(intensity * 2);
     for (let s = 0; s < subCount; s++) {
       const sr = radiusDeg * (0.42 + 0.52 * Math.sqrt(rand()));
       const sθ = rand() * 2 * Math.PI;
       subCenters.push([lat + sr * Math.sin(sθ), lng + sr * Math.cos(sθ)]);
     }
     subCenters.forEach(([ cLat, cLng ], s) => {
-      const count = Math.round(7 + intensity * 14);
+      const count = Math.round(3 + intensity * 6);
       const spread = radiusDeg * (s === 0 ? 0.14 : 0.11);
       generateFrames(cLat, cLng, count, spread, 1000 + i * 10 + s).forEach(([fLat, fLng]) => {
         const [name, addr] = FRAME_NAMES[frameIdx % FRAME_NAMES.length];
         frameIdx++;
         const marker = L.marker([fLat, fLng], {
-          icon: L.divIcon({ html: '<div class="marker-single"></div>', className: "", iconSize: [20, 20], iconAnchor: [10, 10] }),
+          icon: L.divIcon({ html: '<div class="marker-single"></div>', className: "", iconSize: [14, 14], iconAnchor: [7, 7] }),
         });
         marker.on("click", (e) => {
           L.DomEvent.stopPropagation(e);
-          document.getElementById("poiPopup").style.display = "none";
+          hideTooltip();
           // Build frame detail modal
           const owners = ["Octopus","Lamar","Clear Channel","oOh!media","JCDecaux","Outfront","Vistar"];
           const envs = ["Transit > Taxi & Rideshare TV > Other","Street Furniture > Bus Shelter","Retail > Shopping Mall","Roadside > Billboard","Transit > Rail Station"];
@@ -1185,8 +1233,8 @@ document.querySelector(".filter-apply").addEventListener("click", closeFilter);
   const label = document.getElementById("timeCurrent");
   const labelsEl = document.querySelector(".time-labels");
 
-  // Every 4 hours: 0,4,8,...,24 → 7 labels with room to breathe
-  const tickHours = [0,4,8,12,16,20,24];
+  // 3 labels: start, midday, end
+  const tickHours = [0,12,24];
   function hourLabel(h) {
     if (h === 0 || h === 24) return "12AM";
     if (h === 12) return "12PM";
