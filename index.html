@@ -234,7 +234,7 @@
   .map-panel.drag-over .map-drop-hint { display: block; }
 
   /* Ad placement dots */
-  .ad-dot { width: 10px; height: 10px; border-radius: 50%; background: #2b6cdf; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.28); }
+  .ad-dot { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(145deg, #3d7ef5, #1e56c8); border: 1px solid #fff; box-shadow: 0 2px 5px rgba(90,110,160,0.28); }
 
   /* Leaflet overrides */
   .leaflet-container { font-family: inherit; background: #fff; border-radius: 10px; }
@@ -862,8 +862,8 @@ const adPlacements = [
 const adIcon = L.divIcon({
   className: "",
   html: '<div class="ad-dot"></div>',
-  iconSize: [10, 10],
-  iconAnchor: [5, 5],
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
 });
 
 function renderAdPlacements() {
