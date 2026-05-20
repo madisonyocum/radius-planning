@@ -361,18 +361,25 @@
         <div id="map"></div>
 
         <div class="map-controls-block">
-          <button class="map-ctrl-btn" id="postcodesToggle">
+          <button class="map-ctrl-btn active" id="poisToggle">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            Postcodes
-          </button>
-          <button class="map-ctrl-btn" id="heatmapToggle">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-            Heatmap
+            POIs
           </button>
           <div style="display:flex;align-items:center;border-right:1px solid #e6ebf2;padding:0 18px;gap:7px;cursor:pointer;position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a5878" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+            <select id="postcodesSelect" style="appearance:none;-webkit-appearance:none;border:none;background:transparent;font-size:14px;font-weight:600;color:#4a5878;font-family:inherit;cursor:pointer;outline:none;padding-right:14px;width:90px;">
+              <option value="">Postcodes</option>
+              <option value="all">All</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4a5878" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;position:absolute;right:18px;"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;border-right:1px solid #e6ebf2;padding:0 18px;gap:7px;cursor:pointer;position:relative;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a5878" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 12 15 2 8.5"/><polyline points="2 15.5 12 22 22 15.5"/><polyline points="2 12 12 18.5 22 12"/></svg>
-            <select id="hexLevelSelect" style="appearance:none;-webkit-appearance:none;border:none;background:transparent;font-size:14px;font-weight:600;color:#4a5878;font-family:inherit;cursor:pointer;outline:none;padding-right:14px;">
-              <option value="">Hex Level</option>
+            <select id="hexLevelSelect" style="appearance:none;-webkit-appearance:none;border:none;background:transparent;font-size:14px;font-weight:600;color:#4a5878;font-family:inherit;cursor:pointer;outline:none;padding-right:14px;width:90px;">
+              <option value="">Hex Levels</option>
               <option value="3">Level 3</option>
               <option value="4">Level 4</option>
               <option value="5">Level 5</option>
@@ -381,6 +388,10 @@
             </select>
             <svg style="position:absolute;right:18px;pointer-events:none;" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4a5878" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
+          <button class="map-ctrl-btn" id="heatmapToggle">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            Heatmap
+          </button>
           <button class="map-ctrl-btn" id="filterToggle" style="border-right:none;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
             Filters
@@ -468,8 +479,7 @@
 <div class="filter-overlay" id="filterOverlay"></div>
 <div class="filter-panel" id="filterPanel">
   <div class="filter-panel-header">
-    <span class="filter-panel-title">Edit Channels</span>
-    <button class="filter-panel-add" id="filterClose" style="font-size:18px; color:#6b7a99;">×</button>
+    <button class="filter-panel-add" id="filterClose" style="font-size:18px; color:#6b7a99; margin-left:auto;">×</button>
   </div>
   <div class="filter-panel-body" id="filterBody">
     <p class="filter-panel-subtitle">Select and configure the channels for your line item.</p>
@@ -720,6 +730,7 @@ function segmentMetrics(id) {
 
 function renderMap() {
   circleLayer.clearLayers();
+  if (!poisOn) return;
   segments.forEach(({ id, label }, idx) => {
     const { stroke, fill } = colorPalette[idx % colorPalette.length];
     const { aud, fr } = segmentMetrics(id);
@@ -1106,13 +1117,29 @@ function clearCluster() {
   if (clusterGroup) { map.removeLayer(clusterGroup); clusterGroup = null; }
 }
 
-// POIs always on; heatmap + postcodes are independent toggles
+let poisOn = true;
+let heatmapOn = false;
+let postcodesOn = false;
+
 activeMode = "pois";
 renderMap();
 renderFrames();
 
-let heatmapOn = false;
-let postcodesOn = false;
+function updateMetricsVisibility() {
+  const metricsEl = document.getElementById("mapMetrics");
+  const hexVal = document.getElementById("hexLevelSelect").value;
+  const poisOnly = poisOn && !heatmapOn && !postcodesOn && !hexVal;
+  if (!poisOnly && metricsEl) metricsEl.classList.remove("visible");
+  else if (poisOnly) renderMetrics();
+}
+
+document.getElementById("poisToggle").addEventListener("click", function() {
+  poisOn = !poisOn;
+  this.classList.toggle("active", poisOn);
+  if (poisOn) { renderMap(); }
+  else { circleLayer.clearLayers(); }
+  updateMetricsVisibility();
+});
 
 document.getElementById("heatmapToggle").addEventListener("click", function() {
   heatmapOn = !heatmapOn;
@@ -1125,11 +1152,11 @@ document.getElementById("heatmapToggle").addEventListener("click", function() {
     renderMap();
     renderFrames();
   }
+  updateMetricsVisibility();
 });
 
-document.getElementById("postcodesToggle").addEventListener("click", function() {
-  postcodesOn = !postcodesOn;
-  this.classList.toggle("active", postcodesOn);
+document.getElementById("postcodesSelect").addEventListener("change", function() {
+  postcodesOn = this.value !== "";
   if (postcodesOn) {
     renderPostcodes();
   } else {
@@ -1138,6 +1165,11 @@ document.getElementById("postcodesToggle").addEventListener("click", function() 
     renderMap();
     renderFrames();
   }
+  updateMetricsVisibility();
+});
+
+document.getElementById("hexLevelSelect").addEventListener("change", function() {
+  updateMetricsVisibility();
 });
 
 map.on("zoomend", () => { renderMap(); renderFrames(); });
