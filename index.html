@@ -868,8 +868,20 @@ const adIcon = L.divIcon({
 
 function renderAdPlacements() {
   adLayer.clearLayers();
+  // Collect all active radius circles from selected segments
+  const activeCircles = [];
+  state.selectionOrder.forEach(id => {
+    if (!segmentPOIs[id]) return;
+    clusterPOIs(id).forEach(cluster => {
+      activeCircles.push({ lat: cluster.lat, lng: cluster.lng, r: effectiveRadius(id, cluster.radius) });
+    });
+  });
+  if (activeCircles.length === 0) return;
   adPlacements.forEach(([lat, lng]) => {
-    L.marker([lat, lng], { icon: adIcon, interactive: false }).addTo(adLayer);
+    const inside = activeCircles.some(({ lat: cLat, lng: cLng, r }) =>
+      L.latLng(lat, lng).distanceTo(L.latLng(cLat, cLng)) <= r
+    );
+    if (inside) L.marker([lat, lng], { icon: adIcon, interactive: false }).addTo(adLayer);
   });
 }
 
@@ -943,6 +955,7 @@ function renderMap() {
       circle.addTo(circleLayer);
     });
   });
+  renderAdPlacements();
 }
 
 function findLabelById(id, nodes = segmentTree) {
