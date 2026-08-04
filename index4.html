@@ -1116,13 +1116,14 @@ function clearCluster() {
   if (clusterGroup) { map.removeLayer(clusterGroup); clusterGroup = null; }
 }
 
-let poisOn = true;
+let poisOn = false;
 let heatmapOn = false;
-let postcodesOn = false;
+let postcodesOn = true;
 
 activeMode = "pois";
-renderMap();
-renderFrames();
+document.getElementById("poisToggle").classList.remove("active");
+document.getElementById("postcodesSelect").value = "all";
+renderPostcodes();
 
 function updateMetricsVisibility() {
   const metricsEl = document.getElementById("mapMetrics");
@@ -1180,9 +1181,9 @@ document.getElementById("hexLevelSelect").addEventListener("change", function() 
   updateMetricsVisibility();
 });
 
-map.on("zoomend", () => { renderMap(); if (!heatmapOn) renderFrames(); if (heatmapOn) renderHeatmap(); });
+map.on("zoomend", () => { if (!postcodesOn) renderMap(); if (!heatmapOn) renderFrames(); if (heatmapOn) renderHeatmap(); if (postcodesOn) renderPostcodes(); });
 
-setTimeout(() => { map.invalidateSize(); renderMap(); renderFrames(); renderMetrics(); }, 100);
+setTimeout(() => { map.invalidateSize(); if (!postcodesOn) renderMap(); renderPostcodes(); }, 100);
 window.addEventListener("resize", () => map.invalidateSize());
 
 /* ------------ Filter panel (Edit Channels / DOOH) ------------ */
